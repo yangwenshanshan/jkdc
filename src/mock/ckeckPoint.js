@@ -1,0 +1,67 @@
+//关注点清单相关接口
+import Mock from "mockjs";
+import {URL} from './../../config'
+
+Mock.mock(URL+'supervisionCheck/getSupervisionCheckList','get',(option)=>{
+    return{
+        code:200,
+        msg:'success',
+        data:{
+            content:[{
+                functionalAreasId:'',//职能领域id
+                functionalAreasName:'公司治理',//职能领域名称
+                lawsId:'1',//法规id
+                fileName:'',//检查文件名称
+                year:2019,//年度
+                checkPoint:'',//检查点id
+                checkPointContent:'股东资质不符合监管要求;',//检查点内容
+                checkFile:'xxx.pdf',//检查文件
+            },
+            {
+                functionalAreasId:'',//职能领域id
+                functionalAreasName:'股东/股权管理;',//职能领域名称
+                lawsId:'2',//法规id
+                fileName:'',//检查文件名称
+                year:2018,//年度
+                checkPoint:'',//检查点id
+                checkPointContent:'股东资质不符合监管要求;',//检查点内容
+                checkFile:'xxx.pdf',//检查文件
+            },
+            {
+                functionalAreasId:'',//职能领域id
+                functionalAreasName:'股东/股权管理;',//职能领域名称
+                lawsId:'3',//法规id
+                fileName:'',//检查文件名称
+                year:2017,//年度
+                checkPoint:'',//检查点id
+                checkPointContent:'初始入股或增资扩股时不符合规定资质条件;',//检查点内容
+                checkFile:'xxx.pdf',//检查文件
+            },
+            {
+                functionalAreasId:'',//职能领域id
+                functionalAreasName:'股东/股权管理;',//职能领域名称
+                lawsId:'4',//法规id
+                fileName:'',//检查文件名称
+                year:2016,//年度
+                checkPoint:'',//检查点id
+                checkPointContent:'以非自有资金入股;',//检查点内容
+                checkFile:'xxx.pdf',//检查文件
+            },
+            {
+                functionalAreasId:'',//职能领域id
+                functionalAreasName:'股东/股权管理;',//职能领域名称
+                lawsId:'5',//法规id
+                fileName:'',//检查文件名称
+                year:2019,//年度
+                checkPoint:'',//检查点id
+                checkPointContent:'股东入股资金来源不符合要求，以委托资金、债务资金或其他非自由资金入股',//检查点内容
+                checkFile:'xxx.pdf',//检查文件
+            }
+        ]
+        },
+        totalPages:2,//总页面数
+        totalElements:3,//数据总条数
+        size:2,//每页最大数据行数
+        numberOfElements:1,//当前页面数据行数
+    }
+})

@@ -1,0 +1,118 @@
+@font-face {
+    font-family: "iconfont"; /* Project id 2912943 */
+    src: url("iconfont.woff2?t=1637894389988") format("woff2"),
+        url("iconfont.woff?t=1637894389988") format("woff"),
+        url("iconfont.ttf?t=1637894389988") format("truetype");
+}
+
+.iconfont {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-jr-icon-"] {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-jr-icon-three:before {
+    content: "\e663";
+}
+
+.icon-jr-icon-pulldown:before {
+    content: "\e661";
+}
+
+.icon-jr-icon-up:before {
+    content: "\e662";
+}
+
+.icon-jr-icon-two:before {
+    content: "\e65f";
+}
+
+.icon-jr-icon-one:before {
+    content: "\e660";
+}
+
+.icon-jr-icon-see:before {
+    content: "\e69f";
+}
+
+.icon-jr-icon-fire:before {
+    content: "\e69c";
+}
+
+.icon-jr-icon-search:before {
+    content: "\e65c";
+}
+
+.icon-jr-icon-wrong:before {
+    content: "\e623";
+}
+
+.icon-jr-icon-download:before {
+    content: "\e65b";
+}
+
+.icon-jr-icon-Vector:before {
+    content: "\e69b";
+}
+
+.icon-jr-icon-add:before {
+    content: "\e65a";
+}
+
+.icon-jr-icon-modify:before {
+    content: "\e659";
+}
+
+.icon-jr-icon-triangle:before {
+    content: "\e653";
+}
+
+.icon-jr-icon-circular:before {
+    content: "\e658";
+}
+
+.icon-jr-icon-free:before {
+    content: "\e657";
+}
+
+.icon-jr-icon-finger:before {
+    content: "\e656";
+}
+
+.icon-jr-icon-search1:before {
+    content: "\e655";
+}
+
+.icon-jr-icon-detele:before {
+    content: "\e64d";
+}
+
+.icon-jr-icon-error:before {
+    content: "\e651";
+}
+
+.icon-jr-icon-home:before {
+    content: "\e645";
+}
+
+.icon-jr-icon-list:before {
+    content: "\e646";
+}
+
+.icon-jr-icon-man:before {
+    content: "\e647";
+}
+
+.icon-jr-icon-woman:before {
+    content: "\e648";
+}
