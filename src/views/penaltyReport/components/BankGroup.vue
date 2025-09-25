@@ -1,8 +1,14 @@
 <template>
   <div class="BankGroup">
-    <BankBasic :masked-visible="maskedVisible" :options="options" :children="children" @choose="showBankChooseDialog">
+    <BankBasic
+      @change="basicChange"
+      :masked-visible="maskedVisible"
+      :options="options"
+      :children="children"
+      @choose="showBankChooseDialog"
+    >
       <div class="item-title">
-        <p class="title-text">国有大型银行</p>
+        <p class="title-text">{{ activeItem ? activeItem.id : options.placeholder }}</p>
         <div class="title-opt">
           <p class="opt-line"></p>
           <p class="opt-pointer" @click="showBankChooseDialog">重新选择</p>
@@ -26,8 +32,9 @@ export default {
   },
   data () {
     return {
-      maskedVisible: true,
       dialogVisible: false,
+      activeItem: null,
+      checkedCount: 0,
       options: {
         name: '银行群体分析',
         image: step22,
@@ -110,6 +117,9 @@ export default {
     };
   },
   computed: {
+    maskedVisible () {
+      return !this.activeItem
+    }
   },
   watch: {
   },
@@ -121,8 +131,20 @@ export default {
     showBankChooseDialog () {
       this.dialogVisible = true
     },
-    dialogSubmit () {
-
+    dialogSubmit (item) {
+      this.activeItem = item
+      this.dialogVisible = false
+      this.$emit('change', {
+        bank: this.activeItem,
+        count: this.checkedCount
+      })
+    },
+    basicChange (val) {
+      this.checkedCount = val
+      this.$emit('change', {
+        bank: this.activeItem,
+        count: this.checkedCount
+      })
     }
   },
 };

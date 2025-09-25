@@ -1,6 +1,12 @@
 <template>
   <div class="BankMultiple">
-    <BankBasic :masked-visible="maskedVisible" :options="options" :children="children" @choose="showBankChooseDialog">
+    <BankBasic
+      @change="basicChange"
+      :masked-visible="maskedVisible"
+      :options="options"
+      :children="children"
+      @choose="showBankChooseDialog"
+    >
       <div class="item-title">
         <p class="title-text">国有大型银行</p>
         <div class="title-opt">
@@ -10,21 +16,27 @@
         </div>
       </div>
     </BankBasic>
+
+    <BankTreeDialog :visible.sync="dialogVisible" @submit="dialogSubmit" />
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
+import BankTreeDialog from './BankTreeDialog.vue'
 import step24 from '../../../assets/images/penaltyReport/step2-4.png'
 
 export default {
   name: "BankMultiple",
   components: {
-    BankBasic
+    BankBasic,
+    BankTreeDialog
   },
   data () {
     return {
-      maskedVisible: true,
+      dialogVisible: false,
+      activeItems: [],
+      checkedCount: 0,
       options: {
         name: '多家对比分析',
         image: step24,
@@ -76,6 +88,9 @@ export default {
     };
   },
   computed: {
+    maskedVisible () {
+      return !this.activeItems.length
+    }
   },
   watch: {
   },
@@ -85,7 +100,22 @@ export default {
   },
   methods: {
     showBankChooseDialog () {
-      console.log(111)
+      this.dialogVisible = true
+    },
+    dialogSubmit (item) {
+      this.activeItems = items
+      this.dialogVisible = false
+      this.$emit('change', {
+        banks: this.activeItems,
+        count: this.checkedCount
+      })
+    },
+    basicChange (val) {
+      this.checkedCount = val
+      this.$emit('change', {
+        banks: this.activeItems,
+        count: this.checkedCount
+      })
     }
   },
 };

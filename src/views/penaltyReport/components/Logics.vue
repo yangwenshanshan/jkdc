@@ -1,8 +1,9 @@
 <template>
   <div class="logics">
-    <BankIndustry></BankIndustry>
-    <BankGroup></BankGroup>
-    <BankSingle></BankSingle>
+    <p class="main-title">已勾选3个逻辑</p>
+    <BankIndustry @change="industryChange"></BankIndustry>
+    <BankGroup @change="groupChange"></BankGroup>
+    <BankSingle @change="singleChange"></BankSingle>
     <BankMultiple></BankMultiple>
   </div>
 </template>
@@ -34,11 +35,26 @@ export default {
   mounted() {
   },
   methods: {
+    industryChange (row) {
+      console.log(row)
+    },
+    groupChange (row) {
+      console.log(row)
+    },
+    singleChange (row) {
+      console.log(row)
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.Logics{
+.logics{
+  .main-title{
+    color: #09958D;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+  }
 }
 </style>

@@ -75,6 +75,9 @@ export default {
     }
   },
   watch: {
+    checkboxCheckedCount (newVal) {
+      this.$emit('change', newVal)
+    }
   },
   created() {
   },

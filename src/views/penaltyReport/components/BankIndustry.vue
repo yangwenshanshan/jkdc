@@ -1,6 +1,6 @@
 <template>
   <div class="BankIndustry">
-    <BankBasic :options="options" :children="children"></BankBasic>
+    <BankBasic @change="basicChange" :options="options" :children="children"></BankBasic>
   </div>
 </template>
 
@@ -15,6 +15,7 @@ export default {
   },
   data () {
     return {
+      checkedCount: 0,
       options: {
         name: '银行业分析',
         image: step21,
@@ -121,6 +122,12 @@ export default {
   mounted() {
   },
   methods: {
+    basicChange (val) {
+      this.checkedCount = val
+      this.$emit('change', {
+        count: this.checkedCount
+      })
+    }
   },
 };
 </script>

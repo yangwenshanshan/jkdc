@@ -1,21 +1,21 @@
 <template>
   <el-dialog center class="BankRadioDialog" :visible.sync="show" width="710px" :close-on-click-modal="false">
     <template slot="title">
-      <div class="dialog-title">
-        {{ title }}
-      </div>
+      <div class="dialog-title">{{ title }}</div>
     </template>
     <div v-loading="loading">
-      <div class="content-input"></div>
+      <div class="content-input">
+        <input type="text" v-model="inputValue" :placeholder="title" @input="inputChange">
+      </div>
       <div class="content-list">
-        <div class="content-item" v-for="(item, index) in arrObj" :key="index">
-          <p>{{ item }}</p>
-          <img v-if="item.checked" src="../../../assets/images/penaltyReport/checkbox-active.png" alt="">
+        <div class="content-item" @click="chooseItem(item)" v-for="(item, index) in tempList" :key="index">
+          <p>国有大型银行{{ item.id }}</p>
+          <img v-if="tempActiveItem && tempActiveItem.id === item.id" src="../../../assets/images/penaltyReport/checkbox-active.png" alt="">
           <img v-else src="../../../assets/images/penaltyReport/checkbox-default.png" alt="">
         </div>
       </div>
     </div>
-    <div class="dialog-footer">确定</div>
+    <div class="dialog-footer" @click="submit">确定</div>
   </el-dialog>
 </template>
 <script>
@@ -38,34 +38,13 @@ export default {
   },
   data() {
     return {
-      arrObj: [
-        {
-          index: 1
-        },
-        {
-          index: 2
-        },
-        {
-          index: 3
-        },
-        {
-          index: 4
-        },
-        {
-          index: 5
-        },
-        {
-          index: 6
-        },
-        {
-          index: 7
-        },
-        {
-          index: 8
-        },
-      ],
+      inputValue: '',
+      list: [],
+      tempList: [],
       show: false,
-      loading: false
+      loading: false,
+      activeItem: null,
+      tempActiveItem: null
     };
   },
   watch: {
@@ -80,9 +59,40 @@ export default {
     }
   },
   methods: {
+    inputChange () {
+      if (this.inputValue) {
+        this.tempList = this.list.filter(el => {
+          return String(el.id).indexOf(this.inputValue) >= 0
+        })
+      } else {
+        this.tempList = { ...this.list }
+      }
+    },
+    chooseItem (item) {
+      if (this.tempActiveItem && this.tempActiveItem.id === item.id) {
+        this.tempActiveItem = null
+        return
+      }
+      this.tempActiveItem = item
+    },
     initData () {
+      for (let index = 0; index < 50; index++) {
+        this.list.push({
+          id: index + 1
+        })
+      }
+      this.inputValue = ''
+      if (this.activeItem) {
+        this.tempActiveItem = { ...this.activeItem }
+      }
+      this.tempList = { ...this.list }
     },
     submit () {
+      if (!this.tempActiveItem) {
+        return
+      }
+      this.activeItem = { ...this.tempActiveItem }
+      this.$emit('submit', this.activeItem)
     }
   }
 }
@@ -95,25 +105,44 @@ export default {
     .el-dialog__body{
       padding: 10px 0;
     }
+    .el-dialog__headerbtn{
+      top: 12px;
+      right: 15px;
+    }
   }
   .content-input{
     width: 588px;
     background-color: #EEEFF2;
     height: 26px;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    input{
+      border: 0;
+      outline: none;
+      background-color: #EEEFF2;
+      font-size: 12px;
+      width: 100%;
+    }
   }
   .content-list{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 18px;
+    column-gap: 96px;
     row-gap: 12px;
     padding: 0 74px;
     height: 310px;
     overflow: auto;
+    margin-top: 14px;
     .content-item{
-      // height: 18px;
       font-family: OPPOSans;
       font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
       img{
         width: 14px;
         height: 14px;
@@ -145,6 +174,7 @@ export default {
     background-color: #fff;
     border-radius: 4px;
     color: #09958D;
+    cursor: pointer;
   }
 }
 </style>

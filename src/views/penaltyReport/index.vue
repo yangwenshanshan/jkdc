@@ -14,7 +14,6 @@
       <div class="report-item">
         <Assistant>第二步，请选择本次处罚分析报告的逻辑。您即可选择单一逻辑，也可选择多个逻辑组合。</Assistant>
         <div class="robot-main">
-          <p class="main-title">已勾选3个逻辑</p>
           <Logics></Logics>
         </div>
       </div>
@@ -80,12 +79,6 @@ export default {
         padding-top: 20px;
         background: #F5F7FD;
         margin-top: 16px;
-        .main-title{
-          color: #09958D;
-          font-size: 18px;
-          text-align: center;
-          font-weight: bold;
-        }
       }
     }
   }

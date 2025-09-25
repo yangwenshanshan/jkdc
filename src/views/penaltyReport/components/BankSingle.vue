@@ -1,34 +1,46 @@
 <template>
   <div class="BankSingle">
-    <BankBasic :masked-visible="maskedVisible" :options="options" :children="children" @choose="showBankChooseDialog">
+    <BankBasic
+      @change="basicChange"
+      :masked-visible="maskedVisible"
+      :options="options"
+      :children="children"
+      @choose="showBankChooseDialog"
+    >
       <div class="item-title">
-        <p class="title-text">国有大型银行</p>
+        <p class="title-text">{{ activeItem ? activeItem.id : options.placeholder }}</p>
         <div class="title-opt">
           <p class="opt-line"></p>
           <p class="opt-pointer" @click="showBankChooseDialog">重新选择</p>
         </div>
       </div>
     </BankBasic>
+    <BankRadioDialog title="选择银行名称（单选）" :visible.sync="dialogVisible" @submit="dialogSubmit" />
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
+import BankRadioDialog from './BankRadioDialog.vue'
 import step23 from '../../../assets/images/penaltyReport/step2-3.png'
 
 export default {
   name: "BankSingle",
   components: {
-    BankBasic
+    BankBasic,
+    BankRadioDialog
   },
   data () {
     return {
-      maskedVisible: true,
+      dialogVisible: false,
+      activeItem: null,
+      checkedCount: 0,
       options: {
         name: '单家银行分析',
         image: step23,
         row: 6,
         column: 3,
+        placeholder: '请先选择银行'
       },
       children: [
         {
@@ -105,6 +117,9 @@ export default {
     };
   },
   computed: {
+    maskedVisible () {
+      return !this.activeItem
+    }
   },
   watch: {
   },
@@ -114,7 +129,22 @@ export default {
   },
   methods: {
     showBankChooseDialog () {
-      console.log(111)
+      this.dialogVisible = true
+    },
+    dialogSubmit (item) {
+      this.activeItem = item
+      this.dialogVisible = false
+      this.$emit('change', {
+        bank: this.activeItem,
+        count: this.checkedCount
+      })
+    },
+    basicChange (val) {
+      this.checkedCount = val
+      this.$emit('change', {
+        bank: this.activeItem,
+        count: this.checkedCount
+      })
     }
   },
 };
