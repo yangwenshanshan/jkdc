@@ -1,7 +1,7 @@
-import step21 from '../../assets/images/penaltyReport/step2-1.png'
-import step22 from '../../assets/images/penaltyReport/step2-2.png'
-import step23 from '../../assets/images/penaltyReport/step2-3.png'
-import step24 from '../../assets/images/penaltyReport/step2-4.png'
+
+
+
+
 
 export function getTimePeriod () {
   const result = [
@@ -44,104 +44,6 @@ export function getTimePeriod () {
     value: `${currentYear}年度`
   })
   return result
-}
-
-export function getBanklogics () {
-  return [
-    {
-      name: '银行业分析',
-      img: step21,
-      checked: false,
-      children: [
-        {
-          name: '概览',
-          children: [
-            {
-              name: '罚单数与金额概览',
-            },
-            {
-              name: '罚单数与金额趋势',
-            }
-          ]
-        },
-        {
-          name: '受罚对象',
-          children: [
-            {
-              name: '受罚对象概览',
-            },
-            {
-              name: '受罚对象趋势',
-            }
-          ]
-        },
-        {
-          name: '总部与属地监管',
-          children: [
-            {
-              name: '总部处罚情况',
-            },
-            {
-              name: '地区分布',
-            }
-          ]
-        },
-        {
-          name: '机构分布',
-        },
-        {
-          name: '职能领域分布',
-        },
-        {
-          name: '典型领域及问题分析',
-          children: [
-            {
-              name: '领域相关处罚概览',
-            },
-            {
-              name: '领域罚单地区分布',
-            },
-            {
-              name: '领域罚单机构分布',
-            },
-            {
-              name: '子领域分布',
-            },
-            {
-              name: '领域趋势',
-            },
-            {
-              name: '典型问题类型',
-            },
-            {
-              name: '典型问题趋势',
-            }
-          ]
-        },
-        {
-          name: '重点银行（Top20）',
-        },
-        {
-          name: '典型大额罚单',
-        },
-      ]
-    },
-    {
-      name: '银行群体分析',
-      img: step22,
-      checked: false
-    },
-    {
-      name: '单价银行分析',
-      img: step23,
-      checked: false
-    },
-    {
-      name: '多家对比分析',
-      img: step24,
-      checked: false
-    }
-  ]
 }
 
 function getPastTwelveMonths() {
