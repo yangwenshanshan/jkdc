@@ -24,6 +24,7 @@
 <script>
 import BankBasic from './BankBasic.vue'
 import BankTreeDialog from './BankTreeDialog.vue'
+import { getMultiple, flattenAndAddInfoTree } from './data'
 import step24 from '../../../assets/images/penaltyReport/step2-4.png'
 
 export default {
@@ -34,57 +35,16 @@ export default {
   },
   data () {
     return {
+      logics: [],
+      children: [],
       dialogVisible: false,
       activeItems: [],
-      checkedCount: 0,
       options: {
         name: '多家对比分析',
         image: step24,
         row: 5,
         column: 2,
       },
-      children: [
-        {
-          name: '总体对比',
-          isTitle: true
-        },
-        {
-          name: '各行罚单数与金额排名',
-          isCheckbox: true
-        },
-        {
-          name: '各行罚单数与金额排名趋势变化',
-          isCheckbox: true
-        },
-        {
-          name: '地区对比',
-          isTitle: true
-        },
-        {
-          name: '各行受罚较重地区Top5',
-          isCheckbox: true
-        },
-        {
-          name: '地区处罚中各行排名',
-          isCheckbox: true
-        },
-        {
-          name: '领域对比',
-          isTitle: true
-        },
-        {
-          name: '各行受罚较重领域Top5',
-          isCheckbox: true
-        },
-        {
-          name: '典型领域中各行排名',
-          isCheckbox: true
-        },
-        {
-          name: '各行受罚较重问题类型Top10',
-          isCheckbox: true,
-        },
-      ]
     };
   },
   computed: {
@@ -95,6 +55,7 @@ export default {
   watch: {
   },
   created() {
+    this.children = flattenAndAddInfoTree(getMultiple())
   },
   mounted() {
   },
@@ -102,19 +63,19 @@ export default {
     showBankChooseDialog () {
       this.dialogVisible = true
     },
-    dialogSubmit (item) {
+    dialogSubmit (items) {
       this.activeItems = items
       this.dialogVisible = false
       this.$emit('change', {
         banks: this.activeItems,
-        count: this.checkedCount
+        logics: this.logics
       })
     },
     basicChange (val) {
-      this.checkedCount = val
+      this.logics = val
       this.$emit('change', {
         banks: this.activeItems,
-        count: this.checkedCount
+        logics: this.logics
       })
     }
   },

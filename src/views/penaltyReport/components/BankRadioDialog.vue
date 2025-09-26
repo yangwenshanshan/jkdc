@@ -9,7 +9,7 @@
       </div>
       <div class="content-list">
         <div class="content-item" @click="chooseItem(item)" v-for="(item, index) in tempList" :key="index">
-          <p>国有大型银行{{ item.id }}</p>
+          <p>{{ item.name }}</p>
           <img v-if="tempActiveItem && tempActiveItem.id === item.id" src="../../../assets/images/penaltyReport/checkbox-active.png" alt="">
           <img v-else src="../../../assets/images/penaltyReport/checkbox-default.png" alt="">
         </div>
@@ -20,6 +20,7 @@
 </template>
 <script>
 import Checkbox from './Checkbox.vue'
+import { getBankList } from './data';
 
 export default {
   name: "BankRadioDialog",
@@ -76,22 +77,21 @@ export default {
       this.tempActiveItem = item
     },
     initData () {
-      for (let index = 0; index < 50; index++) {
-        this.list.push({
-          id: index + 1
-        })
-      }
+      this.list = getBankList()
       this.inputValue = ''
       if (this.activeItem) {
         this.tempActiveItem = { ...this.activeItem }
+      } else {
+        this.tempActiveItem = null
       }
       this.tempList = { ...this.list }
     },
     submit () {
       if (!this.tempActiveItem) {
-        return
+        this.activeItem = null
+      } else {
+        this.activeItem = { ...this.tempActiveItem }
       }
-      this.activeItem = { ...this.tempActiveItem }
       this.$emit('submit', this.activeItem)
     }
   }
@@ -143,6 +143,12 @@ export default {
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
+      p{
+        width: 183px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       img{
         width: 14px;
         height: 14px;

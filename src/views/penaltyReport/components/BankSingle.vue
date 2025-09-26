@@ -22,6 +22,7 @@
 <script>
 import BankBasic from './BankBasic.vue'
 import BankRadioDialog from './BankRadioDialog.vue'
+import { flattenAndAddInfoTree, getSingle } from './data'
 import step23 from '../../../assets/images/penaltyReport/step2-3.png'
 
 export default {
@@ -32,9 +33,10 @@ export default {
   },
   data () {
     return {
+      logics: [],
+      children: [],
       dialogVisible: false,
       activeItem: null,
-      checkedCount: 0,
       options: {
         name: '单家银行分析',
         image: step23,
@@ -42,78 +44,7 @@ export default {
         column: 3,
         placeholder: '请先选择银行'
       },
-      children: [
-        {
-          name: '概览',
-          isTitle: true
-        },
-        {
-          name: '罚单数与金额概览',
-          isCheckbox: true
-        },
-        {
-          name: '罚单数与金额趋势',
-          isCheckbox: true
-        },
-        {
-          name: '受罚对象',
-          isTitle: true
-        },
-        {
-          name: '受罚对象概览',
-          isCheckbox: true
-        },
-        {
-          name: '受罚对象趋势',
-          isCheckbox: true
-        },
-        {
-          name: '总部与属地监管',
-          isTitle: true
-        },
-        {
-          name: '总部处罚情况',
-          isCheckbox: true
-        },
-        {
-          name: '地区分布',
-          isCheckbox: true
-        },
-        {
-          name: '职能领域分布',
-          isCheckbox: true,
-          isTitle: true
-        },
-        {
-          name: '典型领域及问题分析',
-          isTitle: true
-        },
-        {
-          name: '领域相关处罚概览',
-          isCheckbox: true
-        },
-        {
-          name: '领域罚单地区分布',
-          isCheckbox: true
-        },
-        {
-          name: '子领域分布',
-          isCheckbox: true
-        },
-        {
-          name: '典型问题趋势',
-        },
-        {
-          name: '重点银行（Top20）',
-          isCheckbox: true,
-          isTitle: true
-        },
-        {
-          name: '典型大额罚单',
-          isCheckbox: true,
-          isTitle: true
-        },
-      ]
+      children: []
     };
   },
   computed: {
@@ -124,6 +55,7 @@ export default {
   watch: {
   },
   created() {
+    this.children = flattenAndAddInfoTree(getSingle())
   },
   mounted() {
   },
@@ -136,14 +68,14 @@ export default {
       this.dialogVisible = false
       this.$emit('change', {
         bank: this.activeItem,
-        count: this.checkedCount
+        logics: this.logics
       })
     },
     basicChange (val) {
-      this.checkedCount = val
+      this.logics = val
       this.$emit('change', {
         bank: this.activeItem,
-        count: this.checkedCount
+        logics: this.logics
       })
     }
   },

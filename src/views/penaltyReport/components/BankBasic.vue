@@ -75,8 +75,8 @@ export default {
     }
   },
   watch: {
-    checkboxCheckedCount (newVal) {
-      this.$emit('change', newVal)
+    checkboxCheckedCount () {
+      this.$emit('change', this.children.filter(el => el.checked))
     }
   },
   created() {
@@ -88,16 +88,14 @@ export default {
       this.$emit('choose')
     },
     changeAllChecked () {
-      const filterChildren = this.children.filter(el => el.isCheckbox)
-
       if (this.allChecked) {
         this.allChecked = false
-        filterChildren.forEach(el => {
+        this.children.forEach(el => {
           this.$set(el, 'checked', false)
         });
       } else {
         this.allChecked = true
-        filterChildren.forEach(el => {
+        this.children.forEach(el => {
           this.$set(el, 'checked', true)
         });
       }
@@ -105,6 +103,15 @@ export default {
     changeChecked (it) {
       if (it.isCheckbox) {
         this.$set(it, 'checked', !it.checked)
+        if (it.parentId) {
+          const parentIndex = this.children.findIndex(el => el.id === it.parentId)
+          const parentChildren = this.children.filter(el => el.parentId === it.parentId)
+          const parentChecked = parentChildren.some(el => el.checked)
+          if (parentIndex >= 0) {
+            const row = this.children[parentIndex]
+            this.$set(row, 'checked', parentChecked)
+          }
+        }
         if (this.checkboxCount === this.checkboxCheckedCount) {
           this.allChecked = true
         } else {
