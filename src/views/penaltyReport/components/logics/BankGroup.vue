@@ -15,15 +15,15 @@
         </div>
       </div>
     </BankBasic>
-    <BankRadioDialog title="选择银行类型（单选）" :visible.sync="dialogVisible" @submit="dialogSubmit" />
+    <BankRadioDialog title="选择银行类型（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
 import BankRadioDialog from './BankRadioDialog.vue'
-import step22 from '../../../assets/images/penaltyReport/step2-2.png'
-import { getGroup, flattenAndAddInfoTree } from './data'
+import step22 from '../../../../assets/images/penaltyReport/step2-2.png'
+import { getGroup, flattenAndAddInfoTree } from '../logics/data'
 
 export default {
   name: "BankGroup",

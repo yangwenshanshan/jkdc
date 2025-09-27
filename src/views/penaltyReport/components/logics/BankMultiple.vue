@@ -1,5 +1,5 @@
 <template>
-  <div class="BankSingle">
+  <div class="BankMultiple">
     <BankBasic
       @change="basicChange"
       :masked-visible="maskedVisible"
@@ -8,54 +8,54 @@
       @choose="showBankChooseDialog"
     >
       <div class="item-title">
-        <p class="title-text">{{ activeItem ? activeItem.id : options.placeholder }}</p>
+        <p class="title-text">国有大型银行</p>
         <div class="title-opt">
+          <p class="opt-pointer">查看已选银行</p>
           <p class="opt-line"></p>
           <p class="opt-pointer" @click="showBankChooseDialog">重新选择</p>
         </div>
       </div>
     </BankBasic>
-    <BankRadioDialog title="选择银行名称（单选）" :visible.sync="dialogVisible" @submit="dialogSubmit" />
+
+    <BankTreeDialog :visible.sync="dialogVisible" @confirm="dialogSubmit" />
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
-import BankRadioDialog from './BankRadioDialog.vue'
-import { flattenAndAddInfoTree, getSingle } from './data'
-import step23 from '../../../assets/images/penaltyReport/step2-3.png'
+import BankTreeDialog from './BankTreeDialog.vue'
+import { getMultiple, flattenAndAddInfoTree } from '../logics/data'
+import step24 from '../../../../assets/images/penaltyReport/step2-4.png'
 
 export default {
-  name: "BankSingle",
+  name: "BankMultiple",
   components: {
     BankBasic,
-    BankRadioDialog
+    BankTreeDialog
   },
   data () {
     return {
       logics: [],
       children: [],
       dialogVisible: false,
-      activeItem: null,
+      activeItems: [],
       options: {
-        name: '单家银行分析',
-        image: step23,
-        row: 6,
-        column: 3,
-        placeholder: '请先选择银行'
+        name: '多家对比分析',
+        image: step24,
+        row: 5,
+        column: 2,
       },
-      children: []
     };
   },
   computed: {
     maskedVisible () {
-      return !this.activeItem
+      return !this.activeItems.length
     }
   },
   watch: {
   },
   created() {
-    this.children = flattenAndAddInfoTree(getSingle())
+    this.children = flattenAndAddInfoTree(getMultiple())
   },
   mounted() {
   },
@@ -63,18 +63,18 @@ export default {
     showBankChooseDialog () {
       this.dialogVisible = true
     },
-    dialogSubmit (item) {
-      this.activeItem = item
+    dialogSubmit (items) {
+      this.activeItems = items
       this.dialogVisible = false
       this.$emit('change', {
-        bank: this.activeItem,
+        banks: this.activeItems,
         logics: this.logics
       })
     },
     basicChange (val) {
       this.logics = val
       this.$emit('change', {
-        bank: this.activeItem,
+        banks: this.activeItems,
         logics: this.logics
       })
     }
@@ -83,7 +83,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.BankSingle{
+.BankMultiple{
+  ::v-deep .step2-contet-item{
+    .item-content{
+      .item-left{
+        .item-left-img{
+          height: 120px;
+        }
+      }
+    }
+  }
   .item-title{
     background-color: #EBEDF5;
     height: 26px;

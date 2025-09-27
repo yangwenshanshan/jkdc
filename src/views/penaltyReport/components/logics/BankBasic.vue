@@ -2,8 +2,8 @@
   <div class="bankBasic">
     <div class="step2-contet-item">
       <div class="item-checkbox" @click="changeAllChecked">
-        <img v-if="allChecked" src="../../../assets/images/penaltyReport/checkbox-active.png" alt="">
-        <img v-else src="../../../assets/images/penaltyReport/checkbox-default.png" alt="">
+        <img v-if="allChecked" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
+        <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
         <p>全选</p>
       </div>
       <div class="item-content">
@@ -23,8 +23,8 @@
             <div class="item-self-item" v-for="(it, i) in children" :key="i" @click="changeChecked(it)">
               <p class="self-text" :class="it.isTitle ? 'is-parent' : 'is-children'">{{ it.name }}</p>
               <template v-if="it.isCheckbox">
-                <img v-if="it.checked" src="../../../assets/images/penaltyReport/checkbox-active.png" alt="">
-                <img v-else src="../../../assets/images/penaltyReport/checkbox-default.png" alt="">
+                <img v-if="it.checked" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
+                <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
               </template>
             </div>
           </div>
@@ -88,6 +88,9 @@ export default {
       this.$emit('choose')
     },
     changeAllChecked () {
+      if (this.maskedVisible) {
+        return
+      }
       if (this.allChecked) {
         this.allChecked = false
         this.children.forEach(el => {

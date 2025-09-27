@@ -1,5 +1,12 @@
 <template>
-  <el-dialog center class="BankTreeDialog" :visible.sync="show" width="710px" :close-on-click-modal="false">
+  <BankBaseDialog 
+    class="BankTreeDialog"
+    :visible.sync="show"
+    width="710px"
+    :cancel-visible="false"
+    :confirm-text="confirmText"
+    @confirm="confirm"
+  >
     <div class="tree-content" v-loading="loading">
       <div class="contet-left">
         <p class="left-title">选择对比银行(上限30家)</p>
@@ -10,15 +17,15 @@
           <div class="bank-group-item" v-for="(item, index) in tree" :key="index">
             <div class="group-item" @click="openGroup(item)">
               <div class="item-more">
-                <img :class="{ 'opened': item.opened }" src="../../../assets/images/penaltyReport/more.png" alt="">
+                <img :class="{ 'opened': item.opened }" src="../../../../assets/images/penaltyReport/more.png" alt="">
               </div>
               <p class="group-name">{{ item.name }}</p>
             </div>
             <div class="bank-single-list" v-show="item.opened">
               <div :class="{ 'checked': it.checked }" class="bank-single-item" v-for="(it, i) in item.children" :key="i" @click="changeChecked(it)">
                 <p class="single-name">{{ it.name }}</p>
-                <img v-if="it.checked" src="../../../assets/images/penaltyReport/checkbox-active.png" alt="">
-                <img v-else src="../../../assets/images/penaltyReport/checkbox-default.png" alt="">
+                <img v-if="it.checked" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
+                <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
               </div>
             </div>
           </div>
@@ -30,23 +37,22 @@
           <div class="checked-item" v-for="(item, index) in tempCheckedList" :key="index">
             <p>{{ item.name }}</p>
             <div class="item-close" @click="changeChecked(item)">
-              <img src="../../../assets/images/penaltyReport/close.png" alt="">
+              <img src="../../../../assets/images/penaltyReport/close.png" alt="">
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="dialog-footer" @click="submit">下一步</div>
-  </el-dialog>
+  </BankBaseDialog>
 </template>
 <script>
-import Checkbox from './Checkbox.vue'
-import { getBankTreeList } from './data';
+import BankBaseDialog from '../BankBaseDialog.vue'
+import { getBankTreeList } from '../logics/data';
 
 export default {
   name: "BankTreeDialog",
   components: {
-    Checkbox
+    BankBaseDialog
   },
   props: {
     visible: {
@@ -62,7 +68,8 @@ export default {
       show: false,
       loading: false,
       checkedList: [],
-      tempCheckedList: []
+      tempCheckedList: [],
+      confirmText: '下一步'
     };
   },
   watch: {
@@ -115,12 +122,12 @@ export default {
         ref.scrollTo(0, ref.scrollHeight)
       })
     },
-    submit () {
+    confirm () {
       if (!this.tempCheckedList) {
         this.checkedList = []
       } else {
         this.checkedList = [ ...this.tempCheckedList ]
-        this.$emit('submit', this.checkedList)
+        this.$emit('confirm', this.checkedList)
       }
     }
   }
@@ -129,17 +136,11 @@ export default {
 <style lang="scss" scoped>
 .BankTreeDialog{
   ::v-deep .el-dialog{
-    border-radius: 4px;
-    position: relative;
     .el-dialog__header{
       padding: 0;
     }
     .el-dialog__body{
       padding: 0;
-    }
-    .el-dialog__headerbtn{
-      top: 12px;
-      right: 15px;
     }
   }
   .tree-content{
@@ -293,24 +294,6 @@ export default {
         }
       }
     }
-  }
-  .dialog-footer{
-    position: absolute;
-    height: 40px;
-    width: 100%;
-    bottom: -44px;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: OPPOSans;
-    font-weight: bold;
-    font-size: 16px;
-    line-height: 1;
-    background-color: #fff;
-    border-radius: 4px;
-    color: #09958D;
-    cursor: pointer;
   }
 }
 </style>

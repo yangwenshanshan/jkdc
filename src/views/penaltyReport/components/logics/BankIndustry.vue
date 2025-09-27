@@ -6,8 +6,8 @@
 
 <script>
 import BankBasic from './BankBasic.vue'
-import { getIndustry, flattenAndAddInfoTree } from './data'
-import step21 from '../../../assets/images/penaltyReport/step2-1.png'
+import { getIndustry, flattenAndAddInfoTree } from '../logics/data'
+import step21 from '../../../../assets/images/penaltyReport/step2-1.png'
 
 export default {
   name: "BankIndustry",

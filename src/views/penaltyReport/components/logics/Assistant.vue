@@ -1,7 +1,7 @@
 <template>
   <div class="assistant">
     <div class="robot-info">
-      <img src="../../../assets/images/penaltyReport/robot.png" alt="">
+      <img src="../../../../assets/images/penaltyReport/robot.png" alt="">
       <p>报告小助手</p>
     </div>
     <div class="robot-content">
