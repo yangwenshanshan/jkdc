@@ -79,6 +79,7 @@ export default {
       this.$emit('confirm')
     },
     cancel () {
+      this.show = false
       this.$emit('cancel')
     }
   }
