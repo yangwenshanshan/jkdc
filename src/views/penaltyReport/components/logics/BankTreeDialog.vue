@@ -15,14 +15,17 @@
         </div>
         <div class="left-main">
           <div class="bank-group-item" v-for="(item, index) in tree" :key="index">
-            <div class="group-item" @click="openGroup(item)">
+            <div class="item-result" v-if="item.id === 'search_results'">
+              <p>机构名称</p>
+            </div>
+            <div v-else class="group-item" @click="openGroup(item)">
               <div class="item-more">
                 <img :class="{ 'opened': item.opened }" src="../../../../assets/images/penaltyReport/more.png" alt="">
               </div>
               <p class="group-name">{{ item.name }}</p>
             </div>
             <div class="bank-single-list" v-show="item.opened">
-              <div :class="{ 'checked': it.checked }" class="bank-single-item" v-for="(it, i) in item.children" :key="i" @click="changeChecked(it)">
+              <div class="bank-single-item" :class="{ 'checked': it.checked, 'small-padding-left': item.id === 'search_results' }" v-for="(it, i) in item.children" :key="i" @click="leftChangeChecked(it)">
                 <p class="single-name">{{ it.name }}</p>
                 <img v-if="it.checked" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
                 <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
@@ -36,7 +39,7 @@
         <div class="checked-list" ref="checkedList">
           <div class="checked-item" v-for="(item, index) in tempCheckedList" :key="index">
             <p>{{ item.name }}</p>
-            <div class="item-close" @click="changeChecked(item)">
+            <div class="item-close" @click="rightChangeChecked(item, index)">
               <img src="../../../../assets/images/penaltyReport/close.png" alt="">
             </div>
           </div>
@@ -86,11 +89,46 @@ export default {
   methods: {
     inputChange () {
       if (this.inputValue) {
-        // this.tempTree = this.tree.filter(el => {
-        //   return String(el.id).indexOf(this.inputValue) >= 0
-        // })
+        const checkedBankIds = this.tempCheckedList.map(item => item.id);
+        const matchedBanks = [];
+        this.tempTree.forEach(group => {
+          if (group.children && group.children.length) {
+            const matchingBanks = group.children.filter(bank => 
+              bank.name.toLowerCase().includes(this.inputValue.toLowerCase())
+            );
+            matchingBanks.forEach(bank => {
+              if (checkedBankIds.includes(bank.id)) {
+                bank.checked = true;
+              }
+              matchedBanks.push(bank);
+            });
+          }
+        });
+        const filteredTree = [{
+          id: 'search_results',
+          name: '搜索结果',
+          opened: true,
+          children: matchedBanks
+        }];
+        
+        this.tree = filteredTree;
       } else {
-        this.tempTree = { ...this.tree }
+        const checkedBanks = [ ...this.tempCheckedList ];
+        this.tree = [ ...this.tempTree ]
+        this.tree.forEach(group => {
+          const hasCheckedBank = group.children && group.children.some(bank => 
+            checkedBanks.some(item => item.id === bank.id)
+          );
+          if (hasCheckedBank) {
+            this.$set(group, 'opened', true);
+          }
+          if (group.children && group.children.length) {
+            group.children.forEach(bank => {
+              const isChecked = checkedBanks.some(item => item.id === bank.id);
+              this.$set(bank, 'checked', isChecked);
+            });
+          }
+        });
       }
     },
     openGroup (group) {
@@ -98,6 +136,8 @@ export default {
     },
     initData () {
       this.tree = getBankTreeList()
+      // 保存原始树结构，用于搜索和恢复
+      this.tempTree = [ ...this.tree ]
       this.inputValue = ''
       if (this.checkedList) {
         this.tempCheckedList = [ ...this.checkedList ]
@@ -124,9 +164,20 @@ export default {
       } else {
         this.tempCheckedList = []
       }
-      this.tempTree = { ...this.tree }
     },
-    changeChecked (it) {
+    rightChangeChecked (it, i) {
+      this.tempCheckedList.splice(i, 1)
+      this.tree.forEach(group => {
+        if (group.children && group.children.length) {
+          group.children.forEach(bank => {
+            if (bank.id === it.id) {
+              this.$set(bank, 'checked', false)
+            }
+          })
+        }
+      })
+    },
+    leftChangeChecked (it) {
       if (this.tempCheckedList.length >= 30 && !it.checked) {
         return
       }
@@ -135,7 +186,7 @@ export default {
       if (index >= 0) {
         this.tempCheckedList.splice(index, 1)
       } else {
-        this.tempCheckedList.push(it)
+        this.tempCheckedList.push({ ...it })
       }
       this.$nextTick(() => {
         const ref = this.$refs.checkedList
@@ -203,6 +254,11 @@ export default {
         overflow-y: auto;
         .bank-group-item{
           margin-bottom: 10px;
+          .item-result{
+            padding-left: 24px;
+            color: #6B6E83;
+            font-size: 12px;
+          }
           .group-item{
             height: 18px;
             display: flex;
@@ -263,6 +319,9 @@ export default {
               &.checked{
                 // background-color: #E7ECF4;
               }
+            }
+            .small-padding-left{
+              padding-left: 24px;
             }
           }
         }

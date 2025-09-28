@@ -26,7 +26,7 @@
       width="710px"
       :cancel-visible="false"
       :confirm-text="'重新选择'"
-      @confirm="showBankChooseDialog"
+      @confirm="selectedBanksVisible = false"
       :title="selectedBanksTitle"
     >
       <div class="selected-banks-content">
@@ -87,7 +87,6 @@ export default {
   methods: {
     showBankChooseDialog () {
       this.dialogVisible = true
-      this.selectedBanksVisible = false
     },
     showSelectedBanks() {
       if (this.activeItems.length > 0) {
@@ -141,7 +140,6 @@ export default {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          cursor: pointer;
           .bank-name{
             width: 183px;
             overflow: hidden;
