@@ -101,6 +101,26 @@ export default {
       this.inputValue = ''
       if (this.checkedList) {
         this.tempCheckedList = [ ...this.checkedList ]
+        // 遍历树形结构，根据已选列表设置checked状态
+        this.tree.forEach(group => {
+          if (group.children && group.children.length) {
+            // 检查该分组是否有已勾选的银行
+            const hasCheckedBank = group.children.some(bank => 
+              this.tempCheckedList.some(item => item.id === bank.id)
+            )
+            
+            // 如果有已勾选的银行，自动展开父节点
+            if (hasCheckedBank) {
+              this.$set(group, 'opened', true)
+            }
+            
+            group.children.forEach(bank => {
+              // 检查银行是否在已选列表中
+              const isChecked = this.tempCheckedList.some(item => item.id === bank.id)
+              this.$set(bank, 'checked', isChecked)
+            })
+          }
+        })
       } else {
         this.tempCheckedList = []
       }

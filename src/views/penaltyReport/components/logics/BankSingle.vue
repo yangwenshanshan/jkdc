@@ -8,7 +8,7 @@
       @choose="showBankChooseDialog"
     >
       <div class="item-title">
-        <p class="title-text">{{ activeItem ? activeItem.id : options.placeholder }}</p>
+        <p class="title-text">{{ activeItem ? activeItem.name : options.placeholder }}</p>
         <div class="title-opt">
           <p class="opt-line"></p>
           <p class="opt-pointer" @click="showBankChooseDialog">重新选择</p>

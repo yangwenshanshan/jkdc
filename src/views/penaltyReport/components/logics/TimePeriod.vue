@@ -40,6 +40,7 @@ export default {
     chooseTime(item){
       this.activeSubValue = item.value
       this.activeTime = { ...item }
+      this.$emit('change', this.activeTime)
     },
     getTimePeriod () {
       const result = [

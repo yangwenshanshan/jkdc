@@ -39,7 +39,10 @@
           <div class="outline-item" v-for="(item, index) in list" :key="index">
             <p class="item-title">{{ chineseNum[index] }}、{{ item.name }}</p>
             <div v-for="(it, i) in item.logics" :key="i">
-              <p class="self-text" :class="it.isTitle ? 'is-parent' : 'is-children'">{{ it.name }}</p>
+              <p class="self-text" :class="it.isTitle ? 'is-parent' : 'is-children'">
+                <span>{{ it.header }}{{ it.sub ? `.${it.sub}` : ''}}、</span>
+                <span>{{ it.name }}</span>
+              </p>
             </div>
           </div>
         </div>

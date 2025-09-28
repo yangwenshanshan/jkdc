@@ -76,7 +76,21 @@ export default {
   },
   watch: {
     checkboxCheckedCount () {
-      this.$emit('change', this.children.filter(el => el.checked))
+      const list = this.children.filter(el => el.checked)
+      let headerTitle = 0
+      let subTitle = 1
+      list.forEach(el => {
+        if (el.level === 0) {
+          headerTitle++
+          el.header = headerTitle
+          subTitle = 1
+        } else {
+          el.header = headerTitle
+          el.sub = subTitle
+          subTitle++
+        }
+      })
+      this.$emit('change', list)
     }
   },
   created() {
