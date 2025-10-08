@@ -60,7 +60,7 @@ import BankMultiple from './components/logics/BankMultiple.vue'
 import BankSingle from './components/logics/BankSingle.vue'
 import BankIndustry from './components/logics/BankIndustry.vue'
 import BankBaseDialog from './components/BankBaseDialog.vue'
-import api from './components/logics/api'
+import { getReportLogic } from './apis'
 
 export default {
   name: "PenaltyReport",
@@ -82,6 +82,7 @@ export default {
       groupLogics: [],
       singleLogics: [],
       multipleLogics: [],
+      multipleActive: null,
       groupBank: null,
       singleBank: null,
       multipleBanks: [],
@@ -109,15 +110,18 @@ export default {
       })
       if (this.groupLogics && this.groupLogics.length) result.push({
         name: '银行群体分析',
-        logics: this.groupLogics
+        logics: this.groupLogics,
+        bank: this.groupBank,
       })
       if (this.singleLogics && this.singleLogics.length) result.push({
         name: '单家银行分析',
-        logics: this.singleLogics
+        logics: this.singleLogics,
+        bank: this.singleBank,
       })
       if (this.multipleLogics && this.multipleLogics.length) result.push({
         name: '多家对比分析',
-        logics: this.multipleLogics
+        logics: this.multipleLogics,
+        bank: this.multipleBanks,
       })
       return result
     }
@@ -146,13 +150,14 @@ export default {
     },
     multipleChange (row) {
       this.multipleLogics = row.logics
+      this.multipleActive = row.activeBank
       this.multipleBanks = row.banks
     },
     getReportLogicApi() {
-      api.getReportLogic({
+      getReportLogic({
         fields: 'id,name,sort,categories.id,categories.name,categories.sort,categories.indexes.id,categories.indexes.sort,categories.indexes.index.id,categories.indexes.index.name,categories.indexes.index.manual_id',
         sort: 'sort',
-        filter: '{"deep":{"categories":{"_sort":"sort"}}}'
+        deep: '{"categories":{"_sort":"sort","indexes":{"_sort":"sort"}}}',
       }).run().then(res => {
         this.logicsFinish = true
         this.industryData = res.data[0]
@@ -164,10 +169,11 @@ export default {
     dialogConfirm () {
       sessionStorage.setItem('tableOfContents', JSON.stringify({
         logic: this.list,
-        time: this.timePeriod
+        time: this.timePeriod,
+        highlight: this.multipleActive
       }))
       this.$router.push({
-        path: '/penaltyReport/detail'
+        path: '/reportAssistant/detail'
       })
     }
   },
@@ -234,6 +240,14 @@ export default {
     .disabled{
       color: #9BA3B4;
       cursor: not-allowed;
+    }
+  }
+  .bankOutline{
+    .el-dialog{
+      background-color: #F5F7FD;
+    }
+    .dialog-footer{
+      background-color: #F5F7FD;
     }
   }
   .bankOutline-main{

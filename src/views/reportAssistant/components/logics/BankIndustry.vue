@@ -26,7 +26,6 @@ export default {
       options: {
         name: '',
         image: step21,
-        row: 7,
         column: 3,
       },
     };

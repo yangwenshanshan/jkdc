@@ -15,7 +15,7 @@
         </div>
       </div>
     </BankBasic>
-    <BankRadioDialog title="选择银行名称（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
+    <BankRadioDialog :data="singleData" title="选择银行名称（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
   </div>
 </template>
 
@@ -24,6 +24,7 @@ import BankBasic from './BankBasic.vue'
 import BankRadioDialog from './BankRadioDialog.vue'
 import { flattenAndAddInfoTree, getSingle } from '../logics/data'
 import step23 from '../../../../assets/images/penaltyReport/step2-3.png'
+import api from './api'
 
 export default {
   name: "BankSingle",
@@ -31,14 +32,20 @@ export default {
     BankBasic,
     BankRadioDialog
   },
+  props: {
+    data: {
+      type: Object,
+    }
+  },
   data () {
     return {
+      singleData: [],
       logics: [],
       children: [],
       dialogVisible: false,
       activeItem: null,
       options: {
-        name: '单家银行分析',
+        name: '',
         image: step23,
         row: 6,
         column: 3,
@@ -55,7 +62,16 @@ export default {
   watch: {
   },
   created() {
-    this.children = flattenAndAddInfoTree(getSingle())
+    this.options.name = this.data.name
+    this.children = flattenAndAddInfoTree(this.data.categories)
+    api.getBankSingleList({
+      fields: 'id,name,manual_id',
+      sort: 'manual_id',
+      'filter[_and][0][type][parent][_eq]': '9f1f2c25-130c-4b4a-a14b-bb6ba81911a6',
+      // 'filter[_and][1][id][_in]': '65089adc-7b43-4c9e-b1dd-413fd2d04b2a,ac4cc5eb-cc04-46e8-8f88-cc4b869b58a7',
+    }).run().then(res => {
+      this.singleData = res.data
+    })
   },
   mounted() {
   },

@@ -37,6 +37,44 @@
         </div>
       </div>
     </BankBaseDialog>
+
+    <BankBaseDialog 
+      class="sort-banks-dialog"
+      :visible.sync="sortDialogVisible"
+      width="710px"
+      :cancel-text="'重新选择'"
+      :confirm-text="'确定'"
+      @cancel="sortDialogCancel"
+      @confirm="sortDialogConfirm"
+      :title="selectedBanksTitle"
+    >
+      <div class="sort-list">
+        <div class="sort-item" style="margin-bottom: 20px;">
+          <p class="item-num-placeholder"></p>
+          <div class="item-name">
+            <p class="name-text-green">报告中对各家银行的展示顺序如下，您可点击箭头调整排序。</p>
+          </div>
+          <div class="item-sort">调整排序</div>
+          <div class="item-checkbox">是否高亮（单选）</div>
+        </div>
+        <div class="sort-item" v-for="(item, index) in activeItems" :key="index">
+          <p class="item-num">{{ index + 1 }}</p>
+          <div class="item-name">
+            <p class="name-text">{{ item.name }}</p>
+          </div>
+          <div class="item-sort">
+            <div v-if="index === 0" style="width: 14px;height: 14px;"></div>
+            <img v-if="index !== 0" @click="sortClick(index - 1, index)" src="../../../../assets/images/penaltyReport/sort.png" alt="">
+            <img v-if="index !== activeItems.length - 1" @click="sortClick(index, index + 1)" style="transform: rotate(180deg);" src="../../../../assets/images/penaltyReport/sort.png" alt="">
+            <div v-if="index === activeItems.length - 1" style="width: 14px;height: 14px;"></div>
+          </div>
+          <div class="item-checkbox" @click="highlightIndex = index">
+            <img v-if="highlightIndex === index" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
+            <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
+          </div>
+        </div>
+      </div>
+    </BankBaseDialog>
   </div>
 </template>
 
@@ -44,7 +82,7 @@
 import BankBasic from './BankBasic.vue'
 import BankTreeDialog from './BankTreeDialog.vue'
 import BankBaseDialog from '../BankBaseDialog.vue'
-import { getMultiple, flattenAndAddInfoTree } from '../logics/data'
+import { flattenAndAddInfoTree } from '../logics/data'
 import step24 from '../../../../assets/images/penaltyReport/step2-4.png'
 
 export default {
@@ -61,6 +99,8 @@ export default {
   },
   data () {
     return {
+      highlightIndex: -1,
+      sortDialogVisible: false,
       logics: [],
       children: [],
       dialogVisible: false,
@@ -69,7 +109,6 @@ export default {
       options: {
         name: '',
         image: step24,
-        row: 5,
         column: 2,
       },
     };
@@ -102,17 +141,33 @@ export default {
     dialogSubmit (items) {
       this.activeItems = items
       this.dialogVisible = false
-      this.$emit('change', {
-        banks: this.activeItems,
-        logics: this.logics
+      this.$nextTick(() => {
+        this.sortDialogVisible = true
       })
     },
     basicChange (val) {
       this.logics = val
       this.$emit('change', {
         banks: this.activeItems,
+        activeBank: this.highlightIndex >= 0 ? this.activeItems[this.highlightIndex] : null,
         logics: this.logics
       })
+    },
+    sortClick (index1, index2) {
+      let temp = this.activeItems[index1];
+      this.$set(this.activeItems, index1, this.activeItems[index2])
+      this.$set(this.activeItems, index2, temp)
+    },
+    sortDialogConfirm () {
+      this.$emit('change', {
+        banks: this.activeItems,
+        activeBank: this.highlightIndex >= 0 ? this.activeItems[this.highlightIndex] : null,
+        logics: this.logics
+      })
+      this.sortDialogVisible = false
+    },
+    sortDialogCancel () {
+      this.dialogVisible = true
     }
   },
 };
@@ -194,6 +249,81 @@ export default {
       }
       .opt-pointer{
         cursor: pointer;
+      }
+    }
+  }
+  .sort-banks-dialog{
+    .sort-list{
+      padding: 0 66px 0 108px;
+      .sort-item{
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        .item-num-placeholder{
+          width: 14px;
+          height: 14px;
+          margin-right: 14px;
+        }
+        .item-num{
+          width: 14px;
+          height: 14px;
+          border-radius: 2px;
+          background-color: #F4F4F4;
+          font-size: 12px;
+          line-height: 14px;
+          text-align: center;
+          color: #919AA1;
+          margin-right: 14px;
+        }
+        .item-name{
+          width: 350px;
+          .name-text{
+            width: 183px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: OPPOSans;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 18px;
+          }
+          .name-text-green{
+            font-family: OPPOSans;
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 16px;
+            color: #09958D;
+          }
+        }
+        .item-sort{
+          min-width: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          font-size: 12px;
+          color: #999CA3;
+          line-height: 16px;
+          img{
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+          }
+        }
+        .item-checkbox{
+          min-width: 96px;
+          margin-left: 14px;
+          font-size: 12px;
+          color: #999CA3;
+          line-height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          img{
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+          }
+        }
       }
     }
   }

@@ -91,6 +91,7 @@ import ChartHandbookChart from "../views/ChartHandbook/chartHandbookChart.vue";
 import ChartHandbookText from "../views/ChartHandbook/chartHandbookText.vue";
 import Chat from "../views/Chat";
 import PenaltyReport from "../views/penaltyReport/index.vue";
+import PenaltyReportDetail from "../views/penaltyReport/detail/index.vue";
 Vue.use(VueRouter);
 
 const routes = [
@@ -119,6 +120,11 @@ const routes = [
                 path: "/penaltyReport",
                 name: "PenaltyReport",
                 component: PenaltyReport
+            },
+            {
+                path: "/penaltyReport/detail",
+                name: "PenaltyReportDetail",
+                component: PenaltyReportDetail
             },
             {
                 path: "/regulation",

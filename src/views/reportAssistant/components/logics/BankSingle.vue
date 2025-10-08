@@ -1,5 +1,5 @@
 <template>
-  <div class="BankGroup">
+  <div class="BankSingle">
     <BankBasic
       @change="basicChange"
       :masked-visible="maskedVisible"
@@ -15,19 +15,19 @@
         </div>
       </div>
     </BankBasic>
-    <BankRadioDialog :data="groupData" title="选择银行类型（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
+    <BankRadioDialog :data="singleData" title="选择银行名称（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
 import BankRadioDialog from './BankRadioDialog.vue'
-import step22 from '../../../../assets/images/penaltyReport/step2-2.png'
-import { getGroup, flattenAndAddInfoTree } from '../logics/data'
-import api from './api'
+import { flattenAndAddInfoTree } from '../logics/data'
+import step23 from '../../../../assets/images/penaltyReport/step2-3.png'
+import { getBankSingleList } from '../../apis'
 
 export default {
-  name: "BankGroup",
+  name: "BankSingle",
   components: {
     BankBasic,
     BankRadioDialog
@@ -39,18 +39,18 @@ export default {
   },
   data () {
     return {
-      groupData: [],
+      singleData: [],
       logics: [],
       children: [],
       dialogVisible: false,
       activeItem: null,
       options: {
         name: '',
-        image: step22,
-        row: 6,
+        image: step23,
         column: 3,
-        placeholder: "请先选择银行群体"
+        placeholder: '请先选择银行'
       },
+      children: []
     };
   },
   computed: {
@@ -63,12 +63,13 @@ export default {
   created() {
     this.options.name = this.data.name
     this.children = flattenAndAddInfoTree(this.data.categories)
-    api.getBankGroupList({
-      filter: '{"parent":{"_eq":"9f1f2c25-130c-4b4a-a14b-bb6ba81911a6"}}',
-      sort: 'sort',
-      fields: 'id,name,sort'
+    getBankSingleList({
+      fields: 'id,name,manual_id',
+      sort: 'manual_id',
+      'filter[_and][0][type][parent][_eq]': '9f1f2c25-130c-4b4a-a14b-bb6ba81911a6',
+      // 'filter[_and][1][id][_in]': '65089adc-7b43-4c9e-b1dd-413fd2d04b2a,ac4cc5eb-cc04-46e8-8f88-cc4b869b58a7',
     }).run().then(res => {
-      this.groupData = res.data
+      this.singleData = res.data
     })
   },
   mounted() {
@@ -97,7 +98,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.BankGroup{
+.BankSingle{
   .item-title{
     background-color: #EBEDF5;
     height: 26px;

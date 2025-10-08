@@ -23,8 +23,8 @@
 import BankBasic from './BankBasic.vue'
 import BankRadioDialog from './BankRadioDialog.vue'
 import step22 from '../../../../assets/images/penaltyReport/step2-2.png'
-import { getGroup, flattenAndAddInfoTree } from '../logics/data'
-import api from './api'
+import { flattenAndAddInfoTree } from '../logics/data'
+import { getBankGroupList } from '../../apis'
 
 export default {
   name: "BankGroup",
@@ -47,7 +47,6 @@ export default {
       options: {
         name: '',
         image: step22,
-        row: 6,
         column: 3,
         placeholder: "请先选择银行群体"
       },
@@ -63,7 +62,7 @@ export default {
   created() {
     this.options.name = this.data.name
     this.children = flattenAndAddInfoTree(this.data.categories)
-    api.getBankGroupList({
+    getBankGroupList({
       filter: '{"parent":{"_eq":"9f1f2c25-130c-4b4a-a14b-bb6ba81911a6"}}',
       sort: 'sort',
       fields: 'id,name,sort'
