@@ -85,6 +85,7 @@ export class RequestManager {
         } catch (error) {
           if (!error.response || error.response.status !== 401) {
             eventBus.$emit(`${axiosInfo.key}_error`, error);
+            return
           }
           if (!isRefreshing) {
             isRefreshing = true

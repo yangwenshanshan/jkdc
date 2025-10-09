@@ -34,8 +34,8 @@
         <LabelRadio :value="dimension_date" :data="dimensionDate" @change="dateChange"></LabelRadio>
         <LabelRadio :value="dimension_regulator" :data="dimensionRegulator" @change="regulatorChange"></LabelRadio>
         <LabelRadio :value="dimension_entity" :data="dimensionEntity" @change="entityChange"></LabelRadio>
-        <LabelSelect :value="dimension_area" :data="dimensionArea" @change="areaChange"></LabelSelect>
-        <LabelSelect :value="dimension_theme" :data="dimensionTheme" @change="themeChange"></LabelSelect>
+        <LabelSelect :value="dimension_area" :data="dimensionArea" @change="areaChange" width="95px"></LabelSelect>
+        <LabelSelect :color="theme" :value="dimension_theme" :data="dimensionTheme" @change="themeChange" width="114px"></LabelSelect>
       </div>
     </BankBaseDialog>
   </div>
@@ -56,6 +56,12 @@ export default {
   },
   data () {
     return {
+      theme: '#09958D',
+      themes: {
+        'green': '#09958D',
+        'blue': '#2C92FF',
+        'red': '#DE2F2F',
+      },
       dialogVisible: false,
       dialogDate: null,
       dialogRegulator: null,
@@ -188,7 +194,8 @@ export default {
       this.dimension_date = this.dialogDate.value
       this.dimension_regulator = this.dialogRegulator.value
       this.dimension_entity = this.dialogEntity.value
-      this.dimension_area = this.dialogArea.id
+      this.dimension_area = this.dialogArea ? this.dialogArea.id : ''
+      this.dimension_theme = this.dialogTheme ? this.dialogTheme.id : 'green'
       this.dialogVisible = false
       this.$emit('change', {
         dimension_date: this.dimension_date,
@@ -212,6 +219,7 @@ export default {
     },
     themeChange (info) {
       this.dialogTheme = info
+      this.theme = this.themes[this.dialogTheme.id || 'green']
     }
   },
 };
