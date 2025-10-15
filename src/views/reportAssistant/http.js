@@ -138,9 +138,11 @@ function refreshToken () {
           mode: "json"
         }
       }).then((res) => {
+        isRefreshing = false
         localStorage.setItem("tokenData", JSON.stringify(res.data.data));
         resolve(res.data.data)
       }).catch(() => {
+        isRefreshing = false
         localStorage.removeItem("user");
         app.$message.error("登录状态过期");
         app.$router.replace("/login");
