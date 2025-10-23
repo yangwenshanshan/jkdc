@@ -1,5 +1,5 @@
 <template>
-  <div class="label-radio">
+  <div class="label-radio" :style="`--label-radio-bg:${color}`">
     <p class="radio-title">{{ data.name }}：</p>
     <div class="radio-list">
       <p class="radio-item" :class="{ 'active': activeIndex === index }" v-for="(item, index) in data.chooses" @click="chooseIndex(index)" :key="item.value">{{ item.label }}</p>
@@ -12,6 +12,10 @@
 export default {
   name: "LabelRadio",
   props: {
+    color: {
+      type: String,
+      default: '',
+    },
     value: {
       type: String,
       default: '',
@@ -62,7 +66,7 @@ export default {
       padding: 4px 12px;
       cursor: pointer;
       &.active{
-        background-color: #09958D;
+        background-color: var(--label-radio-bg);
         color: #fff;
       }
     }

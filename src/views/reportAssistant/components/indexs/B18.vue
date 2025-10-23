@@ -1,9 +1,21 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
-        <BarAndLine v-if="isChart" style="height: 340px;" :dimension="dimension" :datas="datas"
-            :colors="colors.B18[theme]" />
-        <BaseTable v-else height="340px" :dimension="dimension" :datas="datas" />
+        <TitleCom :title="isChart ? '领域罚单地区分布图' : '领域罚单地区分布表'" />
+        <BarAndLine v-if="isChart" style="height: 330px;" :dimension="dimension" :datas="datas"
+            :colors="colors.B18[theme]" :customOption="{
+                grid: {
+                    bottom: 50
+                },
+                xAxis: {
+                    axisLabel: {
+                        formatter: function (value) {
+                            return value.split('').join('\n')
+                        }
+                    }
+                }
+            }" />
+        <BaseTable v-else :dimension="dimension" :datas="datas" />
     </PanelItem>
 </template>
 
@@ -16,6 +28,8 @@ import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B18 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B18",
@@ -26,17 +40,26 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "省/市",
@@ -63,23 +86,22 @@ export default {
         }
     },
     mounted() {
-        this.getB18().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB18()
+        EventBus.$on('reportAssistantDomainChange', this.getB18)
+        EventBus.$on('reportAssistantFilterChange', this.getB18)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB18() {
-            return B18({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
-                domain: window.sessionStorage.getItem('reportAssistantDomain'),
+            this.cantrol = B18(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data.map(item => ({
+                    ...item,
+                    area_name: item.area_name.replace(/[省|市|回族自治区|维吾尔族自治区|壮族自治区|自治区]/g, '')
+                }))
+                this.content = res.summary
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

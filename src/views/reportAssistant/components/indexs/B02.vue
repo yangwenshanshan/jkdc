@@ -1,10 +1,11 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content1_2">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start" style="overflow: auto;">
-            <div v-for="(item) in config" :key="item.key" style="margin:0 15px;">
+            <div v-for="(item) in config" :key="item.key"
+                :style="{ flex: 'none', marginRight: '15px', width: (dimension.length - 1) * datas[item.key].length * 30 + 120 + 'px' }">
                 <TitleCom :title="item.label" />
-                <BarAndLine style="height: 196px;width:350px;" :dimension="dimension" :datas="datas[item.key]"
+                <BarAndLine style="height: 196px;" :dimension="dimension" :datas="datas[item.key]"
                     :colors="colors.B02[theme]" :customOption="{
                         grid: {
                             top: 10,
@@ -20,7 +21,7 @@
         </div>
         <div v-else>
             <TitleCom title="罚单数与金额趋势表" />
-            <BaseTable height="205px" :dimension="dimension_2" :datas="datas_2" />
+            <BaseTable :dimension="dimension_2" :datas="datas_2" />
         </div>
     </PanelItem>
 </template>
@@ -34,6 +35,8 @@ import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B02 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B02",
@@ -44,70 +47,36 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
-    data() {
-        return {
-            colors: colors,
-            isChart: true,
-            dimension: [
-                {
-                    label: "日期",
-                    prop: "period",
-                    type: "bar",
-                },
-                {
-                    label: "罚单数",
-                    prop: "ticket_count",
-                    type: "bar",
-                },
-                {
-                    label: "案由数",
-                    prop: "reason_count",
-                    type: "bar",
-                },
-                {
-                    label: "罚没金额",
-                    prop: "total_amount",
-                    type: "line",
-                },
-            ],
-            content1_2: '',
-            config: [
-                {
-                    label: "总览",
-                    key: "total"
-                },
-                {
-                    label: "金监局",
-                    key: "jinjianju"
-                },
-                {
-                    label: "外管局",
-                    key: "waiguanju"
-                },
-                {
-                    label: "人民银行",
-                    key: "renminyinhang"
-                },
-            ],
-            datas: {
-                total: [],
-                jinjianju: [],
-                waiguanju: [],
-                renminyinhang: [],
-            },
-            dimension_2: [
+    computed: {
+        widthCom() {
+            return (this.dimension.length - 1) * this.datas.total.length * 30 + 120
+        },
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+        dimension_2() {
+            return [
                 {
                     label: "",
-                    prop: "period",
-                    type: "bar",
+                    prop: "period-parent",
                     labelClassName: "#f6f6f6",
+                    children: [
+                        {
+                            label: "时段",
+                            prop: "period",
+                            labelClassName: "#f6f6f6",
+                        }
+                    ]
                 },
                 {
                     label: "金监局",
@@ -166,76 +135,126 @@ export default {
                         labelClassName: colors.ColorfulTable[this.theme][5],
                     },]
                 }
-            ],
-            datas_2: [],
-        }
+            ]
+        },
     },
-    mounted() {
-        this.getB02().run().then(res => {
-            console.log(res)
-            const obj = {
+    data() {
+        return {
+            colors: colors,
+            loading: false,
+            isChart: true,
+            dimension: [
+                {
+                    label: "日期",
+                    prop: "period",
+                    type: "bar",
+                },
+                {
+                    label: "罚单数",
+                    prop: "ticket_count",
+                    type: "bar",
+                },
+                {
+                    label: "案由数",
+                    prop: "reason_count",
+                    type: "bar",
+                },
+                {
+                    label: "罚没金额",
+                    prop: "total_amount",
+                    type: "line",
+                },
+            ],
+            content: '',
+            config: [
+                {
+                    label: "总览",
+                    key: "total"
+                },
+                {
+                    label: "金监局",
+                    key: "jinjianju"
+                },
+                {
+                    label: "人民银行",
+                    key: "renminyinhang"
+                },
+                {
+                    label: "外管局",
+                    key: "waiguanju"
+                },
+            ],
+            datas: {
                 total: [],
                 jinjianju: [],
                 waiguanju: [],
                 renminyinhang: [],
-            }
-            const arr = []
-            res.data.forEach(item => {
-                obj.total.push({
-                    period: item.period,
-                    ticket_count: item.total.ticket_count,
-                    reason_count: item.total.reason_count,
-                    total_amount: item.total.total_amount.toFixed(2),
-                })
-                obj.jinjianju.push({
-                    period: item.period,
-                    ticket_count: item.jinjianju.ticket_count,
-                    reason_count: item.jinjianju.reason_count,
-                    total_amount: item.jinjianju.total_amount.toFixed(2),
-                })
-                obj.waiguanju.push({
-                    period: item.period,
-                    ticket_count: item.waiguanju.ticket_count,
-                    reason_count: item.waiguanju.reason_count,
-                    total_amount: item.waiguanju.total_amount.toFixed(2),
-                })
-                obj.renminyinhang.push({
-                    period: item.period,
-                    ticket_count: item.renminyinhang.ticket_count,
-                    reason_count: item.renminyinhang.reason_count,
-                    total_amount: item.renminyinhang.total_amount.toFixed(2),
-                })
-                arr.push({
-                    period: item.period,
-                    ticket_count_total: item.total.ticket_count,
-                    reason_count_total: item.total.reason_count,
-                    total_amount_total: item.total.total_amount.toFixed(2),
-                    ticket_count_jinjianju: item.jinjianju.ticket_count,
-                    reason_count_jinjianju: item.jinjianju.reason_count,
-                    total_amount_jinjianju: item.jinjianju.total_amount.toFixed(2),
-                    ticket_count_waiguanju: item.waiguanju.ticket_count,
-                    reason_count_waiguanju: item.waiguanju.reason_count,
-                    total_amount_waiguanju: item.waiguanju.total_amount.toFixed(2),
-                    ticket_count_renminyinhang: item.renminyinhang.ticket_count,
-                    reason_count_renminyinhang: item.renminyinhang.reason_count,
-                    total_amount_renminyinhang: item.renminyinhang.total_amount.toFixed(2),
-                })
-            })
-            this.datas = obj
-            this.datas_2 = arr
-            this.content1_2 = res.summary.description
-        })
+            },
+            datas_2: [],
+        }
+    },
+    mounted() {
+        this.getB02()
+        EventBus.$on('reportAssistantFilterChange', this.getB02)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB02() {
-            return B02({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B02(this.getParams())
+            this.cantrol.run().then(res => {
+                const obj = {
+                    total: [],
+                    jinjianju: [],
+                    waiguanju: [],
+                    renminyinhang: [],
+                }
+                const arr = []
+                res.data.forEach(item => {
+                    obj.total.push({
+                        period: item.period,
+                        ticket_count: item.total.ticket_count,
+                        reason_count: item.total.reason_count,
+                        total_amount: item.total.total_amount.toFixed(2),
+                    })
+                    obj.jinjianju.push({
+                        period: item.period,
+                        ticket_count: item.jinjianju.ticket_count,
+                        reason_count: item.jinjianju.reason_count,
+                        total_amount: item.jinjianju.total_amount.toFixed(2),
+                    })
+                    obj.waiguanju.push({
+                        period: item.period,
+                        ticket_count: item.waiguanju.ticket_count,
+                        reason_count: item.waiguanju.reason_count,
+                        total_amount: item.waiguanju.total_amount.toFixed(2),
+                    })
+                    obj.renminyinhang.push({
+                        period: item.period,
+                        ticket_count: item.renminyinhang.ticket_count,
+                        reason_count: item.renminyinhang.reason_count,
+                        total_amount: item.renminyinhang.total_amount.toFixed(2),
+                    })
+                    arr.push({
+                        period: item.period,
+                        ticket_count_total: item.total.ticket_count,
+                        reason_count_total: item.total.reason_count,
+                        total_amount_total: item.total.total_amount.toFixed(2),
+                        ticket_count_jinjianju: item.jinjianju.ticket_count,
+                        reason_count_jinjianju: item.jinjianju.reason_count,
+                        total_amount_jinjianju: item.jinjianju.total_amount.toFixed(2),
+                        ticket_count_waiguanju: item.waiguanju.ticket_count,
+                        reason_count_waiguanju: item.waiguanju.reason_count,
+                        total_amount_waiguanju: item.waiguanju.total_amount.toFixed(2),
+                        ticket_count_renminyinhang: item.renminyinhang.ticket_count,
+                        reason_count_renminyinhang: item.renminyinhang.reason_count,
+                        total_amount_renminyinhang: item.renminyinhang.total_amount.toFixed(2),
+                    })
+                })
+                this.datas = obj
+                this.datas_2 = arr
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

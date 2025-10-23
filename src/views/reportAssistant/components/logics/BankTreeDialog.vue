@@ -222,7 +222,6 @@ export default {
       width: 355px;
       background-color: #F2F5F9;
       .left-title{
-        font-family: OPPOSans;
         font-weight: bold;
         font-size: 18px;
         line-height: 1;
@@ -266,7 +265,6 @@ export default {
             cursor: pointer;
             padding-left: 24px;
             .group-name{
-              font-family: OPPOSans;
               font-size: 14px;
               line-height: 1;
               color: #10163C;
@@ -300,7 +298,6 @@ export default {
               padding: 6px 24px 6px 42px;
               cursor: pointer;
               .single-name{
-                font-family: OPPOSans;
                 font-size: 14px;
                 line-height: 1;
                 color: #10163C;
@@ -332,14 +329,12 @@ export default {
       background-color: #ffffff;
       padding-top: 34px;
       .checked-count{
-        font-family: OPPOSans;
         font-size: 12px;
         line-height: 16px;
         color: #09958D;
         padding-left: 33px;
       }
       .checked-list{
-        font-family: OPPOSans;
         font-size: 14px;
         line-height: 18px;
         color: #10163C;

@@ -90,8 +90,8 @@ import ChartHandbook from "../views/ChartHandbook/index.vue";
 import ChartHandbookChart from "../views/ChartHandbook/chartHandbookChart.vue";
 import ChartHandbookText from "../views/ChartHandbook/chartHandbookText.vue";
 import Chat from "../views/Chat";
-import PenaltyReport from "../views/penaltyReport/index.vue";
-import PenaltyReportDetail from "../views/penaltyReport/detail/index.vue";
+import ReportAssistant from "../views/reportAssistant/index.vue";
+import ReportAssistantDetail from "../views/reportAssistant/detail/index.vue";
 Vue.use(VueRouter);
 
 const routes = [
@@ -115,16 +115,6 @@ const routes = [
                 path: "/chat",
                 name: "Chat",
                 component: Chat
-            },
-            {
-                path: "/penaltyReport",
-                name: "PenaltyReport",
-                component: PenaltyReport
-            },
-            {
-                path: "/penaltyReport/detail",
-                name: "PenaltyReportDetail",
-                component: PenaltyReportDetail
             },
             {
                 path: "/regulation",
@@ -307,7 +297,17 @@ const routes = [
                         component: CheckPoint
                     }
                 ]
-            }
+            },
+            {
+                path: "/reportAssistant",
+                name: "ReportAssistant",
+                component: ReportAssistant
+            },
+            {
+                path: "/reportAssistant/detail",
+                name: "ReportAssistantDetail",
+                component: ReportAssistantDetail
+            },
         ]
     },
     {

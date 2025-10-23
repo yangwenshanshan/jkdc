@@ -1,24 +1,25 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
             <div>
                 <TitleCom title="罚单数（张）" />
-                <HorizontalBar style="height: 408px;width:587px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B07[theme]" :customOption="{
+                <HorizontalBar style="width:587px;" :dimension="dimension" :datas="datas" :colors="colors.B07[theme]"
+                    :customOption="{
                         grid: {
-                            top: 10,
+                            top: 5,
                             left: 140
                         },
                     }" />
             </div>
             <div>
                 <TitleCom title="罚没金额（万元）" />
-                <HorizontalBar style="height: 408px;width:443px;" :dimension="dimension_2" :datas="datas"
-                    :colors="colors.B07[theme]" :customOption="{
+                <HorizontalBar style="width:443px;" :dimension="dimension_2" :datas="datas" :colors="colors.B07[theme]"
+                    :customOption="{
                         grid: {
-                            top: 10,
-                            left: 10
+                            top: 5,
+                            left: 10,
+                            right: 80
                         },
                         yAxis: {
                             show: false
@@ -28,7 +29,7 @@
         </div>
         <div v-else>
             <TitleCom title="受罚对象概览表" />
-            <BaseTable height="408px" :dimension="dimension_3" :datas="datas" />
+            <BaseTable :dimension="dimension_3" :datas="datas" />
         </div>
     </PanelItem>
 </template>
@@ -42,6 +43,8 @@ import BaseTable from "../tables/BaseTable.vue"
 import HorizontalBar from "../charts/HorizontalBar.vue"
 import { B07 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B07",
@@ -52,17 +55,26 @@ export default {
         BaseTable,
         HorizontalBar,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "银行类型",
@@ -102,22 +114,18 @@ export default {
         }
     },
     mounted() {
-        this.getB07().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB07()
+        EventBus.$on('reportAssistantFilterChange', this.getB07)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB07() {
-            return B07({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B07(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

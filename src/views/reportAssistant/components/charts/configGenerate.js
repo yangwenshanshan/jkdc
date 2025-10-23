@@ -8,7 +8,7 @@ export const noDataGraphic = () => {
                 text: "暂无数据",
                 font: "'PingFang SC', 'Microsoft YaHei'",
                 fontSize: 14,
-                fill: '#909399', 
+                fill: '#909399',
             }
         }
     ]
@@ -19,16 +19,21 @@ export const defaultConfig = (dimension) => ({
         trigger: 'axis',
         axisPointer: {
             type: 'shadow'
-        }
+        },
+        backgroundColor: '#fff',
+        textStyle: {
+            color: '#606266',
+        },
+        appendTo: () => document.body,
+        className: 'my-chart-tooltip'
     },
     grid: {
         top: 40,
-        bottom:20,
+        bottom: 20,
         left: 60,
         right: 60
     },
     legend: {
-        show: false,
         top: 0,
         data: dimension.slice(1).map(item => item.label)
     },

@@ -1,9 +1,9 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <div class="flex justify-between items-start">
             <div>
                 <TitleCom title="领域趋势图" />
-                <BarAndLine style="height: 276px;width:642px;" :dimension="dimension" :datas="datas"
+                <BarAndLine style="height: 276px;width:670px;" :dimension="dimension" :datas="datas"
                     :colors="colors.B13[theme]" :customOption="{
                         legend: {
                             show: true,
@@ -18,7 +18,6 @@
     </PanelItem>
 </template>
 
-
 <script>
 import PanelItem from "../PanelItem.vue"
 import TitleCom from "../TitleCom.vue"
@@ -26,6 +25,8 @@ import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B13 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B13",
@@ -35,16 +36,25 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
+            loading: true,
             dimension: [
                 {
                     label: "时段",
@@ -67,23 +77,19 @@ export default {
         }
     },
     mounted() {
-        this.getB13().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB13()
+        EventBus.$on('reportAssistantDomainChange', this.getB13)
+        EventBus.$on('reportAssistantFilterChange', this.getB13)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB13() {
-            return B13({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
-                domain: window.sessionStorage.getItem('reportAssistantDomain'),
+            this.cantrol = B13(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         },
     }

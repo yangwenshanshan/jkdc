@@ -1,14 +1,10 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <div class="flex justify-between items-start">
             <div>
                 <TitleCom title="总部处罚情况图" />
-                <BarAndLine style="height: 200px;width:532px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B05[theme]" :customOption="{
-                        legend: {
-                            show: true
-                        },
-                    }" />
+                <BarAndLine style="height: 164px;width:532px;" :dimension="dimension" :datas="datas"
+                    :colors="colors.B05[theme]" />
             </div>
             <div>
                 <TitleCom title="总部处罚情况表" />
@@ -26,6 +22,8 @@ import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B05 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B05",
@@ -35,17 +33,26 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "监管机构类型",
@@ -67,22 +74,18 @@ export default {
         }
     },
     mounted() {
-        this.getB05().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB05()
+        EventBus.$on('reportAssistantFilterChange', this.getB05)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB05() {
-            return B05({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B05(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

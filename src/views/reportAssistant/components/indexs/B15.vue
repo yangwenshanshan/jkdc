@@ -1,6 +1,18 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
-         b15
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
+        <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 40px auto;">
+            <div v-for="(item, index) in datas" :key="index">
+                <TitleCom :title="item.problem_type_name" />
+                <BarAndLine v-if="isChart" style="height: 164px;width:550px;" :dimension="dimension"
+                    :datas="item.trend_data" :colors="colors.B15[theme]" :customOption="{
+                        legend: {
+                            show: true,
+                        }
+                    }" />
+                <BaseTable v-else style="width:516px;" :dimension="dimension" :datas="item.trend_data" />
+            </div>
+        </div>
     </PanelItem>
 </template>
 
@@ -12,7 +24,9 @@ import SwitchCom from "../SwitchCom.vue"
 import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B15 } from '../../apis.js'
-import colors from '../ConstColors.js' 
+import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B15",
@@ -23,49 +37,60 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
-            colors: colors, 
+            colors: colors,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "时段",
-                    prop: "period",
+                    prop: "time_period",
                 },
                 {
-                    label: "机构",
-                    prop: "institution_count",
-                    type: "line"
+                    label: "案由数（个）",
+                    prop: "reason_count",
+                    type: "bar",
                 },
-            ], 
-            datas: [],
+                {
+                    label: "案由金额（万元）",
+                    prop: "total_amount",
+                    type: "line",
+                },
+            ],
             content: '',
+            datas: []
         }
     },
     mounted() {
-        this.getB15().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB15()
+        EventBus.$on('reportAssistantDomainChange', this.getB15)
+        EventBus.$on('reportAssistantFilterChange', this.getB15)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB15() {
-            return B15({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B15(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

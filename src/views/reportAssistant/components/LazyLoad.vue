@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="lazy_load">
         <div v-if="!isLoaded">
             <p class="loading_text">数据加载中...</p>
         </div>
@@ -48,6 +48,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.lazy_load {
+    margin-bottom: 24px;
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
 .loading_text {
     text-align: center;
     font-weight: bolder;

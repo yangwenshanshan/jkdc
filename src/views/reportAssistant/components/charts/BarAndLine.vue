@@ -1,13 +1,18 @@
 <template>
-    <div ref="chartRef"></div>
+    <div ref="chartRef" v-resize="handleResize"></div>
 </template>
 
 <script>
 import merge from 'lodash/merge'
 import { noDataGraphic, defaultConfig } from './configGenerate.js'
 import * as echarts from 'echarts'
+import resize from '@/directives/resize'
+
 export default {
     name: "BarAndLine",
+    directives: {
+        resize
+    },
     props: {
         title: {
             type: String,
@@ -56,6 +61,16 @@ export default {
                 },
                 xAxis: {
                     type: 'category',
+                    axisLabel: {
+                        show: true,
+                        formatter: function (value) {
+                            const arr = value.split('')
+                            if (arr.length > 20) {
+                                arr.splice(20, 0, '\n')
+                            }
+                            return arr.slice(0, 42).join('')
+                        }
+                    }
                 },
                 yAxis: this.dimension.slice(1).map((_, index) => {
                     return {
@@ -97,6 +112,9 @@ export default {
         setOptions() {
             this.chart.clear()
             this.chart.setOption(this.optionCom)
+        },
+        handleResize() {
+            this.chart?.resize()
         }
     },
     mounted() {
@@ -107,9 +125,17 @@ export default {
         datas: {
             handler() {
                 this.setOptions()
+                this.chart?.resize()
             },
             deep: true
-        }
+        },
+        colors: {
+            handler() {
+                this.setOptions()
+                this.chart?.resize()
+            },
+            deep: true
+        },
     }
 }
 </script>

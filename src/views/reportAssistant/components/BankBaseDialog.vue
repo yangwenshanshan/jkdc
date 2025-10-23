@@ -6,17 +6,19 @@
     :width="width"
     :close-on-click-modal="false"
     :showClose="showClose"
+     :style="'--base-dialog-title-color:' + titleColor"
   >
     <template slot="title">
       <div class="dialog-title">{{ title }}</div>
     </template>
     <slot></slot>
     <div class="dialog-footer" v-if="cancelVisible || confirmVisible">
-      <div class="footer-item" v-if="cancelVisible">
-        <p @click="cancel" style="color: #9BA3B4;">{{ cancelText }}</p>
+      <div @click="cancel" class="footer-item" v-if="cancelVisible">
+        <p style="color: #9BA3B4;">{{ cancelText }}</p>
       </div>
-      <div class="footer-item" v-if="confirmVisible">
-        <p @click="confirm">{{ confirmText }}</p>
+      <div class="footer-line" v-if="cancelVisible && confirmVisible"></div>
+      <div @click="confirm" class="footer-item" v-if="confirmVisible">
+        <p>{{ confirmText }}</p>
       </div>
     </div>
   </el-dialog>
@@ -25,6 +27,10 @@
 export default {
   name: "BankBaseDialog",
   props: {
+    titleColor: {
+      type: String,
+      default: '#09958D'
+    },
     width: {
       type: String,
       default: ''
@@ -87,9 +93,13 @@ export default {
 </script>
 <style lang="scss" scoped>
 .BankBaseDialog{
+  display: flex;
+  align-items: center;
+  justify-content: center;
   ::v-deep .el-dialog{
     border-radius: 4px;
     position: relative;
+    margin: auto !important;
     .el-dialog__body{
       padding: 10px 0;
     }
@@ -99,12 +109,10 @@ export default {
     }
   }
   .dialog-title{
-    font-family: OPPOSans;
     font-weight: bold;
     font-size: 18px;
     line-height: 1;
-    letter-spacing: 0%;
-    color: #09958D;
+    color: var(--base-dialog-title-color);
 
   }
   .dialog-footer{
@@ -116,22 +124,24 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: OPPOSans;
     font-weight: bold;
     font-size: 16px;
     line-height: 1;
     background-color: #fff;
     border-radius: 4px;
-    color: #09958D;
+    color: var(--base-dialog-title-color);
     .footer-item{
       flex: 1;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      p{
-        cursor: pointer;
-      }
+      cursor: pointer;
+    }
+    .footer-line{
+      width: 1px;
+      height: 24px;
+      background-color: #D1D1D3;
     }
   }
 }

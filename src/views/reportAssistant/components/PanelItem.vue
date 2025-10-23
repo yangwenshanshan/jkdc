@@ -1,5 +1,5 @@
 <template>
-    <div class="panel_item">
+    <div class="panel_item" v-loading="loading">
         <h3 v-if="subTitle" :style="{ '--sub-title-icon-color1': iconColor1, '--sub-title-icon-color2': iconColor2 }">
             <SubTitleIcon class="sub_title_icon" />
             <span>{{ subTitle }}</span>
@@ -20,7 +20,7 @@ export default {
     components: {
         SubTitleIcon
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
@@ -29,6 +29,10 @@ export default {
         content: {
             type: String,
             default: ''
+        },
+        loading: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -36,6 +40,12 @@ export default {
         }
     },
     computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
         iconColor1() {
             return this.theme === 'green' ? '#56C495' : this.theme === 'blue' ? '#62DDFF' : '#FFCF4D'
         },
@@ -51,7 +61,6 @@ export default {
 
 <style lang="scss" scoped>
 .panel_item {
-    margin-bottom: 40px;
     h3 {
         font-size: 16px;
         line-height: 1;

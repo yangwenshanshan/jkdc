@@ -128,11 +128,10 @@ export default {
     column-gap: 96px;
     row-gap: 12px;
     padding: 0 74px;
-    height: 310px;
+    height: 314px;
     overflow: auto;
     margin-top: 14px;
     .content-item{
-      font-family: OPPOSans;
       font-size: 14px;
       display: flex;
       align-items: center;

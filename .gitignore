@@ -20,5 +20,6 @@ yarn-error.log*
 *.sln
 *.sw?
 
+yarn.lock
 pnpm-lock.yaml
 package-lock.json

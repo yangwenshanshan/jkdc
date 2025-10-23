@@ -11,16 +11,18 @@
         <Assistant>第一步，请选择本次处罚分析报告的时段。</Assistant>
         <TimePeriod @change="timePeriodChange" />
       </div>
-      <div class="report-item" v-if="logicsFinish && timePeriod">
-        <Assistant>第二步，请选择本次处罚分析报告的逻辑。您即可选择单一逻辑，也可选择多个逻辑组合。</Assistant>
-        <div class="robot-main">
-          <p class="main-title">已勾选{{ count }}个逻辑</p>
-          <BankIndustry @change="industryChange" :data="industryData"></BankIndustry>
-          <BankGroup @change="groupChange" :data="groupData"></BankGroup>
-          <BankSingle @change="singleChange" :data="singleData"></BankSingle>
-          <BankMultiple @change="multipleChange" :data="multipleData"></BankMultiple>
+      <transition name="fade">
+        <div class="report-item" v-if="logicsFinish && timePeriod">
+          <Assistant>第二步，请选择本次处罚分析报告的逻辑。您即可选择单一逻辑，也可选择多个逻辑组合。</Assistant>
+          <div class="robot-main">
+            <p class="main-title">已勾选{{ count }}个逻辑</p>
+            <BankIndustry @change="industryChange" :data="industryData"></BankIndustry>
+            <BankGroup @change="groupChange" :data="groupData"></BankGroup>
+            <BankSingle @change="singleChange" :data="singleData"></BankSingle>
+            <BankMultiple @change="multipleChange" :data="multipleData"></BankMultiple>
+          </div>
         </div>
-      </div>
+      </transition>
     </div>
     <div class="export-btn" v-if="timePeriod">
       <p :class="{ 'disabled': count <= 0 }" @click="outlineVisible = true">生成报告</p>
@@ -110,18 +112,15 @@ export default {
       })
       if (this.groupLogics && this.groupLogics.length) result.push({
         name: '银行群体分析',
-        logics: this.groupLogics,
-        bank: this.groupBank,
+        logics: this.groupLogics, 
       })
       if (this.singleLogics && this.singleLogics.length) result.push({
         name: '单家银行分析',
-        logics: this.singleLogics,
-        bank: this.singleBank,
+        logics: this.singleLogics, 
       })
       if (this.multipleLogics && this.multipleLogics.length) result.push({
         name: '多家对比分析',
-        logics: this.multipleLogics,
-        bank: this.multipleBanks,
+        logics: this.multipleLogics, 
       })
       return result
     }
@@ -155,7 +154,7 @@ export default {
     },
     getReportLogicApi() {
       getReportLogic({
-        fields: 'id,name,sort,categories.id,categories.name,categories.sort,categories.indexes.id,categories.indexes.sort,categories.indexes.index.id,categories.indexes.index.name,categories.indexes.index.manual_id',
+        fields: 'id,name,sort,categories.id,categories.name,categories.is_domain_required,categories.sort,categories.indexes.id,categories.indexes.sort,categories.indexes.index.id,categories.indexes.index.name,categories.indexes.index.manual_id',
         sort: 'sort',
         deep: '{"categories":{"_sort":"sort","indexes":{"_sort":"sort"}}}',
       }).run().then(res => {
@@ -167,11 +166,13 @@ export default {
       })
     },
     dialogConfirm () {
-      sessionStorage.setItem('tableOfContents', JSON.stringify({
-        logic: this.list,
-        time: this.timePeriod,
-        highlight: this.multipleActive
-      }))
+      sessionStorage.setItem('reportAssistantLogics', JSON.stringify(this.list))
+      sessionStorage.setItem("reportAssistantTime", JSON.stringify(this.timePeriod))
+      sessionStorage.setItem("reportAssistantGroupBank", this.groupBank?.id || '')
+      sessionStorage.setItem("reportAssistantSingleBank", this.singleBank?.id || '')
+      sessionStorage.setItem("reportAssistantBanks", this.multipleBanks?.map(item => item.id).join(',') || '')
+      sessionStorage.setItem("reportAssistantMainBank", JSON.stringify(this.multipleActive || {}))
+ 
       this.$router.push({
         path: '/reportAssistant/detail'
       })
@@ -182,6 +183,13 @@ export default {
 
 <style lang="scss">
 .penaltyReport{
+  padding-bottom: 20px;
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 2s;
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
   .title{
     display: flex;
     align-items: center;
@@ -253,7 +261,6 @@ export default {
   .bankOutline-main{
     padding: 4px 36px 14px 36px;
     .outline-title{
-      font-family: OPPOSans;
       font-weight: bold;
       font-size: 16px;
       line-height: 1;
@@ -267,18 +274,15 @@ export default {
       margin-top: 20px;
       .outline-item{
         .item-title{
-          font-family: OPPOSans;
-          font-weight: 400;
-          font-size: 16px;
+          font-weight: bold;
+          font-size: 14px;
           line-height: 24px;
           color: #233959;
           margin-bottom: 20px;
         }
         .self-text{
-          font-family: OPPOSans;
           font-weight: 400;
-          font-style: Medium;
-          font-size: 16px;
+          font-size: 14px;
           line-height: 21px;
           margin-bottom: 14px;
           color: #10163C;
@@ -300,6 +304,7 @@ export default {
         .is-parent{
           display: flex;
           align-items: center;
+          font-weight: bold;
           &::before{
             content: '';
             display: block;

@@ -1,13 +1,18 @@
 <template>
-    <div ref="chartRef"></div>
+    <div ref="chartRef" :style="{ height: height, minHeight: '100px' }" v-resize="handleResize"></div>
 </template>
 
 <script>
 import merge from 'lodash/merge'
 import { noDataGraphic, defaultConfig } from './configGenerate.js'
 import * as echarts from 'echarts'
+import resize from '@/directives/resize'
+
 export default {
     name: "PictorialBar",
+    directives: {
+        resize
+    },
     props: {
         colors: {
             type: Array,
@@ -17,6 +22,10 @@ export default {
             type: Array,
             default: () => []
         },
+        symbol: {
+            type: String,
+            default: ''
+        },
         dimension: {
             type: Array,
             default: () => []
@@ -24,10 +33,6 @@ export default {
         customOption: {
             type: Object,
             default: () => ({})
-        },
-        symbol: {
-            type: String,
-            default: 'none'
         }
     },
     data: function () {
@@ -36,6 +41,9 @@ export default {
         };
     },
     computed: {
+        height() {
+            return this.datas.length * 30 + 'px'
+        },
         noData() {
             return this.datas.length < 1
         },
@@ -48,6 +56,9 @@ export default {
 
             const obj = {
                 ...defaultConfig(this.dimension),
+                legend: {
+                    show: false
+                },
                 color: this.colors,
                 dataset: {
                     source: this.datas,
@@ -55,7 +66,7 @@ export default {
                 },
                 xAxis: {
                     type: 'value',
-                    show: false
+                    show: false,
                 },
                 yAxis: {
                     type: 'category',
@@ -65,6 +76,17 @@ export default {
                     },
                     axisTick: {
                         show: true
+                    },
+                    axisLabel: {
+                        show: true,
+                        interval: 0,
+                        formatter: function (value) {
+                            const arr = value.split('')
+                            if (arr.length > 20) {
+                                arr.splice(20, 0, '\n')
+                            }
+                            return arr.slice(0, 42).join('')
+                        }
                     }
                 },
                 series: this.dimension.slice(1).map((item) => {
@@ -78,14 +100,15 @@ export default {
                             show: true,
                             position: 'right',
                             offset: [10, 0],
-                            fontSize: 16
+                            fontSize: 16,
+                            color: this.colors[0]
                         },
+                        type: 'pictorialBar',
+                        barMaxWidth: 24,
                         barGap: '10%',
                         barCategoryGap: '40%',
-                        type: 'pictorialBar',
                         symbolRepeat: true,
-                        symbolSize: ['80%', '60%'],
-                        symbol: this.symbol
+                        symbol: this.symbol,
                     }
                 }),
             }
@@ -96,6 +119,9 @@ export default {
         setOptions() {
             this.chart.clear()
             this.chart.setOption(this.optionCom)
+        },
+        handleResize() {
+            this.chart?.resize()
         }
     },
     mounted() {
@@ -104,7 +130,20 @@ export default {
     },
     watch: {
         datas: {
-            handler(newVal, oldVal) {
+            handler() {
+                this.setOptions()
+            },
+            deep: true
+        },
+        height: {
+            handler() {
+                this.$nextTick(() => {
+                    this.chart?.resize()
+                })
+            }
+        },
+        colors: {
+            handler() {
                 this.setOptions()
             },
             deep: true

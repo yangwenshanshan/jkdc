@@ -12,13 +12,14 @@
 </template>
 
 <script>
+import colors from './ConstColors.js'
 export default {
     name: "SwitchCom",
     model: {
         prop: 'modelValue',
         event: 'update:modelValue'
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         modelValue: {
             type: Boolean,
@@ -34,10 +35,21 @@ export default {
         }
     },
     emits: ['update:modelValue', 'change'],
+    data() {
+        return {
+            colors: colors,
+        }
+    },
     computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
         // 切换按钮背景颜色(根据主题色)
         switchBgColor() {
-            return this.theme === 'green' ? '#09958D' : this.theme === 'blue' ? '#2C92FF' : '#DE2F2F'
+            return this.colors.Base[this.theme]
         },
     },
     methods: {
@@ -54,7 +66,7 @@ export default {
 <style lang="scss" scoped>
 .switch_com {
     text-align: right;
-    margin-bottom: 10px;
+    margin-top: -24px;
 }
 
 .my_switch {
@@ -62,31 +74,38 @@ export default {
     justify-content: center;
     align-items: center;
     border-radius: 4px;
-    background-color: #eee;
     outline: none;
+    background-color: #eee;
 
 
     .switch_item {
         padding: 5px 10px;
         cursor: pointer;
-        border-radius: 4px;
         transition: all 0.2s ease;
         color: #808991;
         font-size: 14px;
         line-height: 14px;
+        background-color: #eee;
+
+        &:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        &:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
 
         &:hover {
-            background-color:  hsl(from #eee h s calc(l - 10));
+            filter: brightness(90%);
         }
     }
 
     .active {
         color: #fff;
         background-color: var(--bg-color);
-
-        &:hover {
-            background-color:  hsl(from var(--bg-color) h s calc(l - 10));
-        }
+        border-radius: 4px;
     }
 }
 </style>

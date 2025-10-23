@@ -26,6 +26,10 @@ Vue.prototype.validForbid = function(value) {
 };
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
+
+import CellPopover from "./views/reportAssistant/components/CellPopover.vue";
+Vue.component("CellPopover", CellPopover);
+
 Vue.prototype.request = function(path, data, method = "post", responseType) {
     let params = data;
     let loading,

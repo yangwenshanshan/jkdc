@@ -1,9 +1,9 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <div class="flex justify-between items-start">
             <div>
                 <TitleCom title="罚单数与金额概览图" />
-                <BarAndLine style="height: 221px;width:580px;" :dimension="dimension" :datas="datas"
+                <BarAndLine style="height: 200px;width:530px;" :dimension="dimension" :datas="datas"
                     :colors="colors.B17[theme]" :customOption="{
                         legend: {
                             show: true,
@@ -12,8 +12,7 @@
             </div>
             <div>
                 <TitleCom title="罚单数与金额概览表" />
-                <BaseTable style="width:500px;" show-summary :dimension="dimension"
-                    :datas="datas" />
+                <BaseTable style="width:500px;" show-summary :dimension="dimension" :datas="datas" />
             </div>
         </div>
     </PanelItem>
@@ -27,6 +26,10 @@ import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B17 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
+
+
 
 export default {
     name: "B17",
@@ -36,16 +39,25 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
+            loading: true,
             dimension: [
                 {
                     label: "监管机构类型",
@@ -73,23 +85,19 @@ export default {
         }
     },
     mounted() {
-        this.getB17().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB17()
+        EventBus.$on('reportAssistantDomainChange', this.getB17)
+        EventBus.$on('reportAssistantFilterChange', this.getB17)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB17() {
-            return B17({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
-                domain: window.sessionStorage.getItem('reportAssistantDomain'),
+            this.cantrol = B17(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary
+            }).finally(() => {
+                this.loading = false
             })
         },
     }

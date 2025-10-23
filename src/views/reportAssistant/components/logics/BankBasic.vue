@@ -174,9 +174,7 @@ export default {
       height: 51px;
       flex-shrink: 0;
       margin: 0 3px 0 36px;
-      font-family: OPPOSans;
       font-weight: 400;
-      font-style: Regular;
       font-size: 16px;
       line-height: 1;
       display: flex;
@@ -204,9 +202,7 @@ export default {
         .item-left-name{
           width: 120px;
           background: #4CBE90;
-          font-family: OPPOSans;
           font-weight: 400;
-          font-style: Medium;
           font-size: 18px;
           color: #FFFFFF;
           text-align: center;
@@ -244,9 +240,7 @@ export default {
           justify-content: center;
           z-index: 1;
           .masked-text{
-            font-family: OPPOSans;
             font-weight: 400;
-            font-style: Medium;
             font-size: 24px;
             color: #233959;
             margin-right: 36px;
@@ -256,9 +250,7 @@ export default {
             height: 30px;
             border-radius: 4px;
             background: #09958D;
-            font-family: OPPOSans;
             font-weight: 400;
-            font-style: Medium;
             font-size: 20px;
             line-height: 28px;
             text-align: center;
@@ -285,9 +277,7 @@ export default {
               margin-left: 25px;
             }
             .self-text{
-              font-family: OPPOSans;
               font-weight: 400;
-              font-style: Medium;
               font-size: 16px;
               line-height: 21px;
             }

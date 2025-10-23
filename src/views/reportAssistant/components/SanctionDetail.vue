@@ -17,7 +17,7 @@
             <div class="illegalityContent">
                 <p class="label">违法事实：</p>
                 <div>
-                    <p v-for="txt in detail.illegalityContent">{{ txt }}</p>
+                    <p v-html="detail.illegalityContent?.replaceAll('；', '；<br/>')"></p>
                 </div>
             </div>
             <div class="punishmentContent">
@@ -29,13 +29,14 @@
 </template>
 
 <script>
+import colors from './ConstColors.js'
 export default {
     name: "SanctionDetail",
     model: {
         prop: 'visible',
         event: 'update:visible'
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         visible: {
             type: Boolean,
@@ -48,12 +49,19 @@ export default {
     },
     data() {
         return {
+            colors: colors,
             visibleCom: false
         }
     },
     computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
         labelColor() {
-            return this.theme === 'green' ? '#09958D' : this.theme === 'blue' ? '#2C92FF' : '#DE2F2F'
+            return this.colors.Base[this.theme]
         },
         bgColor() {
             return this.theme === 'green' ? '#EDF4F4' : this.theme === 'blue' ? '#EBF5FF' : '#FFF5F5'

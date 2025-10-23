@@ -32,6 +32,11 @@
                 >处罚分析</router-link
               >
             </el-dropdown-item>
+            <el-dropdown-item>
+              <router-link to="/reportAssistant"
+                >报告助手</router-link
+              >
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
 
@@ -48,9 +53,6 @@
        
         <router-link to="/chat" :class="{ active: tab === '/chat' }"
           >合规chat</router-link
-        >
-        <router-link to="/penaltyReport" :class="{ active: tab === '/penaltyReport' }"
-          >处罚报告</router-link
         >
         <!-- <router-link
           to="/tools"

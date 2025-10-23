@@ -1,6 +1,6 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
-         b20
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
+        <BaseTable :dimension="dimension" :datas="datas" />
     </PanelItem>
 </template>
 
@@ -12,7 +12,9 @@ import SwitchCom from "../SwitchCom.vue"
 import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B20 } from '../../apis.js'
-import colors from '../ConstColors.js' 
+import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B20",
@@ -23,49 +25,67 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
-            colors: colors, 
-            isChart: true,
+            colors: colors,
+            loading: true,
             dimension: [
                 {
-                    label: "时段",
-                    prop: "period",
+                    label: "银行名称,处罚情况",
+                    diagonal: true,
+                    prop: "bank_name",
+                    render: (h, params) => {
+                        return h('div', {}, [
+                            h('span', {}, params.row.bank_name),
+                            h('span', { class: 'ranke_' + (params.$index + 1) })
+                        ])
+                    }
                 },
                 {
-                    label: "机构",
-                    prop: "institution_count",
-                    type: "line"
+                    label: "罚单数（张）",
+                    prop: "ticket_count",
                 },
-            ], 
+                {
+                    label: "案由数（个） ",
+                    prop: "reason_count",
+                },
+                {
+                    label: "罚没金额（万元）",
+                    prop: "total_amount",
+                },
+            ],
             datas: [],
             content: '',
         }
     },
     mounted() {
-        this.getB20().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB20()
+        EventBus.$on('reportAssistantFilterChange', this.getB20)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB20() {
-            return B20({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B20(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

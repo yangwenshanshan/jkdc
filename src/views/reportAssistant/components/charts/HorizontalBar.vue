@@ -1,13 +1,18 @@
 <template>
-    <div ref="chartRef"></div>
+    <div ref="chartRef" :style="{ height: height, minHeight: '100px' }" v-resize="handleResize"></div>
 </template>
 
 <script>
 import merge from 'lodash/merge'
-import { noDataGraphic, defaultConfig } from './configGenerate'
+import { noDataGraphic, defaultConfig } from './configGenerate.js'
 import * as echarts from 'echarts'
+import resize from '@/directives/resize'
+
 export default {
     name: "HorizontalBar",
+    directives: {
+        resize
+    },
     props: {
         colors: {
             type: Array,
@@ -16,6 +21,10 @@ export default {
         datas: {
             type: Array,
             default: () => []
+        },
+        mainBank: {
+            type: String,
+            default: ''
         },
         dimension: {
             type: Array,
@@ -32,6 +41,9 @@ export default {
         };
     },
     computed: {
+        height() {
+            return this.datas.length * 30 + 'px'
+        },
         noData() {
             return this.datas.length < 1
         },
@@ -44,6 +56,9 @@ export default {
 
             const obj = {
                 ...defaultConfig(this.dimension),
+                legend: {
+                    show: false
+                },
                 color: this.colors,
                 dataset: {
                     source: this.datas,
@@ -51,7 +66,7 @@ export default {
                 },
                 xAxis: {
                     type: 'value',
-                    show: true
+                    show: false,
                 },
                 yAxis: {
                     type: 'category',
@@ -61,6 +76,17 @@ export default {
                     },
                     axisTick: {
                         show: true
+                    },
+                    axisLabel: {
+                        show: true,
+                        interval: 0,
+                        formatter: function (value) {
+                            const arr = value.split('')
+                            if (arr.length > 20) {
+                                arr.splice(20, 0, '\n')
+                            }
+                            return arr.slice(0, 42).join('')
+                        }
                     }
                 },
                 series: this.dimension.slice(1).map((item) => {
@@ -70,8 +96,23 @@ export default {
                             x: item.prop,
                             y: this.dimension[0].prop,
                         },
+                        label: {
+                            show: true,
+                            position: 'right',
+                            offset: [10, 0],
+                            fontSize: 16,
+                            color: this.colors[0]
+                        },
                         type: 'bar',
-                        barMaxWidth: 24
+                        barMaxWidth: 24,
+                        itemStyle: {
+                            color: function (params) {
+                                if (params.name === this.mainBank) {
+                                    return this.colors[1]
+                                }
+                                return params.color
+                            }.bind(this)
+                        }
                     }
                 }),
             }
@@ -82,6 +123,9 @@ export default {
         setOptions() {
             this.chart.clear()
             this.chart.setOption(this.optionCom)
+        },
+        handleResize() {
+            this.chart?.resize()
         }
     },
     mounted() {
@@ -90,7 +134,20 @@ export default {
     },
     watch: {
         datas: {
-            handler(newVal, oldVal) {
+            handler() {
+                this.setOptions()
+            },
+            deep: true
+        },
+        height: {
+            handler() {
+                this.$nextTick(() => {
+                    this.chart?.resize()
+                })
+            }
+        },
+        colors: {
+            handler() {
                 this.setOptions()
             },
             deep: true

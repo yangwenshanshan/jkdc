@@ -3,7 +3,7 @@
     <el-container class="detail-main">
       <el-aside width="379px" class="aside-content">
         <div class="aside-left">
-          <p class="aside-left-item" :class="{ 'active': activeIndex === index }" v-for="(item, index) in types" :key="index" @click="activeIndex = index">{{ chineseNum[index] }}、{{ item.name }}</p>
+          <p class="aside-left-item" :class="{ 'active': activeIndex === index }" v-for="(item, index) in types" :key="index" @click="reportChange(index)">{{ chineseNum[index] }}、{{ item.name }}</p>
         </div>
         <div class="aside-right">
           <p class="right-title">目录</p>
@@ -20,7 +20,7 @@
             <DataDiameter @change="filterChange"></DataDiameter>
           </div>
           <el-main class="main-container">
-            <Report :reportName="activeType.name" />
+            <Report />
           </el-main>
         </div>
       </el-container>
@@ -31,6 +31,7 @@
 <script>
 import DataDiameter from './DataDiameter.vue'
 import Report from "../components/Report.vue"
+import { EventBus } from '../EventBus.js'
 
 export default {
   name: "PenaltyReportDetail",
@@ -40,28 +41,21 @@ export default {
   },
   provide () {
     return {
-      theme: this.theme
+      themeFn: () => this.theme,
+      activeReport: () => this.activeType,
+      getParams: this.getParams
     }
   },
   data () {
     return {
       chineseNum: ['一', '二', '三', '四'],
-      info: {},
+      types: [],
+      time: {},
       activeIndex: -1,
       theme: 'green',
     };
   },
-  computed: {
-    types () {
-      const logic = this.info.logic
-      if (logic && logic.length) {
-        this.activeIndex = 0
-      }
-      return logic
-    },
-    time () {
-      return this.info.time
-    },
+  computed: { 
     activeType() {
       return this.types[this.activeIndex]
     }
@@ -69,14 +63,39 @@ export default {
   watch: {
   },
   created() {
-    const info = sessionStorage.getItem('tableOfContents')
-    this.info = JSON.parse(info)
+    this.types = JSON.parse(sessionStorage.getItem('reportAssistantLogics'))
+    if(this.types.length > 0) {
+      this.activeIndex = 0
+    }
+    this.time = JSON.parse(sessionStorage.getItem('reportAssistantTime')) 
   },
   mounted() {
   },
   methods: {
+    reportChange(index) {
+      this.activeIndex = index
+      EventBus.$emit('reportAssistantCancel')
+    },
     filterChange (params) {
       console.log(params)
+      this.theme = params.dimension_theme
+      window.sessionStorage.setItem("reportAssistantDimensionDate", params.dimension_date)
+      window.sessionStorage.setItem("reportAssistantDimensionRegulator", params.dimension_regulator)
+      window.sessionStorage.setItem("reportAssistantDimensionEntity", params.dimension_entity)
+      window.sessionStorage.setItem("reportAssistantDimensionArea", params.dimension_area===''?'all':params.dimension_area)
+      EventBus.$emit('reportAssistantFilterChange')
+    },
+    getParams (){
+      return {
+        date: JSON.parse(window.sessionStorage.getItem("reportAssistantTime")).value,
+        dimension_date: window.sessionStorage.getItem("reportAssistantDimensionDate"),
+        dimension_regulator: window.sessionStorage.getItem("reportAssistantDimensionRegulator"),
+        dimension_entity: window.sessionStorage.getItem("reportAssistantDimensionEntity"),
+        dimension_area: window.sessionStorage.getItem("reportAssistantDimensionArea"),
+        domain: window.sessionStorage.getItem('reportAssistantDomain'),
+        financial_institution_type: this.activeType.name === "银行群体分析" ? window.sessionStorage.getItem("reportAssistantGroupBank") : undefined,
+        financial_institution: this.activeType.name === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : this.activeType.name === "多家对比分析" ? window.sessionStorage.getItem("reportAssistantBanks") : undefined,
+      }
     }
   },
 };
@@ -85,13 +104,15 @@ export default {
 <style lang="scss" scoped>
 .report-assistant-detail{
   background-color: #EFF1F9;
-  .detail-main{
-    width: 1616px;
-    margin: 0 auto;
-  }
+  padding-top: 20px;
+  // .detail-main{
+  //   // width: 1616px;
+  //   // margin: 0 auto;
+  // }
   .aside-content{
     display: flex;
-    padding-top: 20px;
+    // padding-top: 20px;
+    margin-left: 20px;
     .aside-left{
       width: 154px;
       padding-top: 60px;
@@ -112,7 +133,7 @@ export default {
       }
     }
     .aside-right{
-      height: calc(100vh - 95px);
+      height: calc(100vh - 105px);
       overflow-y: auto;
       background-color: #E7E9EF;
       flex: 1;
@@ -124,9 +145,7 @@ export default {
         margin-bottom: 14px;
       }
       .self-text{
-        font-family: OPPOSans;
         font-weight: 400;
-        font-style: Medium;
         font-size: 14px;
         line-height: 18px;
         margin-bottom: 12px;
@@ -164,16 +183,13 @@ export default {
   }
   .container{
     background-color: #EFF1F9;
-    padding: 20px 0 0 20px;
-    // box-sizing: border-box;
-    height: calc(100vh - 75px);
+    padding: 0 20px;
+    height: calc(100vh - 105px);
     overflow-y: auto;
     .title{
       height: 62px;
       width: 100%;
-      font-family: OPPOSans;
       font-weight: 400;
-      font-style: Medium;
       font-size: 20px;
       line-height: 1;
       display: flex;
@@ -195,6 +211,7 @@ export default {
     .main-container{
       padding: 0;
       margin-top: 20px;
+      overflow-x: hidden;
     }
   }
 }

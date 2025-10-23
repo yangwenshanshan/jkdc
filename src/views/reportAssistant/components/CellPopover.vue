@@ -3,7 +3,7 @@
         <div slot="reference">
             <slot></slot>
         </div>
-        <div :style="{ '--icon-color': iconColor }">
+        <div :style="{ '--icon-color': colors.Base[theme] }">
             <h6>{{ title }}</h6>
             <ul>
                 <li v-for="(item, index) in list" :key="index">
@@ -17,13 +17,11 @@
 </template>
 
 <script>
+import colors from './ConstColors.js'
 export default {
     name: "CellPopover",
-    props: {
-        iconColor: {
-            type: String,
-            default: '#09958D'
-        },
+    inject: ['themeFn', 'activeReport', 'getParams'],
+    props: { 
         title: {
             type: String,
             default: ''
@@ -33,8 +31,14 @@ export default {
             default: () => []
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        }
+    },
     data() {
         return {
+            colors: colors,
         }
     }
 }

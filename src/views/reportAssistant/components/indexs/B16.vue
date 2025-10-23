@@ -1,21 +1,6 @@
 <template>
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
-        <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
-        <TitleCom title="地区分布图" />
-        <BarAndLine v-if="isChart" style="height: 340px;" :dimension="dimension" :datas="datas"
-            :colors="colors.B06[theme]" :customOption="{
-                grid: {
-                    bottom: 50
-                },
-                xAxis: {
-                    axisLabel: {
-                        formatter: function (value) {
-                            return value.split('').join('\n')
-                        }
-                    }
-                }
-            }" />
-        <BaseTable v-else :dimension="dimension" :datas="datas" />
+        b16
     </PanelItem>
 </template>
 
@@ -26,13 +11,13 @@ import TitleCom from "../TitleCom.vue"
 import SwitchCom from "../SwitchCom.vue"
 import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
-import { B06 } from '../../apis.js'
+import { B16 } from '../../apis.js'
 import colors from '../ConstColors.js'
 import http from '../../http.js'
 import { EventBus } from '../../EventBus.js'
 
 export default {
-    name: "B06",
+    name: "B16",
     components: {
         PanelItem,
         TitleCom,
@@ -62,17 +47,12 @@ export default {
             loading: true,
             dimension: [
                 {
-                    label: "省/市",
-                    prop: "area_name",
+                    label: "时段",
+                    prop: "period",
                 },
                 {
-                    label: "罚单数（张）",
-                    prop: "ticket_count",
-                    type: "bar"
-                },
-                {
-                    label: "罚没金额（万元）",
-                    prop: "total_amount",
+                    label: "机构",
+                    prop: "institution_count",
                     type: "line"
                 },
             ],
@@ -81,18 +61,16 @@ export default {
         }
     },
     mounted() {
-        this.getB06()
-        EventBus.$on('reportAssistantFilterChange', this.getB06)
+        this.getB16()
+        EventBus.$on('reportAssistantDomainChange', this.getB15)
+        EventBus.$on('reportAssistantFilterChange', this.getB16)
         EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
-        getB06() {
-            this.cantrol = B06(this.getParams())
+        getB16() {
+            this.cantrol = B16(this.getParams())
             this.cantrol.run().then(res => {
-                this.datas = res.data.map(item => ({
-                    ...item,
-                    area_name: item.area_name.replace(/[省|市|回族自治区|维吾尔族自治区|壮族自治区|自治区]/g, '')
-                }))
+                this.datas = res.data
                 this.content = res.summary.description
             }).finally(() => {
                 this.loading = false

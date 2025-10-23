@@ -1,24 +1,24 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
-            <div>
+            <div :style="{ width: showAll ? '587px' : '100%' }">
                 <TitleCom title="机构" />
-                <PictorialBar style="height: 300px;width:587px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B03[theme]" :symbol="iconBank" :customOption="{
+                <PictorialBar :dimension="dimension" :datas="datas" :colors="colors.B03[theme]" :symbol="iconBank"
+                    :customOption="{
                         grid: {
-                            top: 10,
+                            top: 5,
                             left: 140
                         },
                     }" />
             </div>
-            <div>
+            <div v-if="showAll" style="width:443px;">
                 <TitleCom title="个人" />
-                <PictorialBar style="height: 300px;width:443px;" :dimension="dimension_2" :datas="datas"
-                    :colors="colors.B03[theme]" :symbol="iconBank" :customOption="{
+                <PictorialBar :dimension="dimension_2" :datas="datas" :colors="colors.B03[theme]" :symbol="iconUser"
+                    :customOption="{
                         grid: {
-                            top: 10,
-                            left: 0
+                            top: 5,
+                            left: 10
                         },
                         yAxis: {
                             show: false,
@@ -28,7 +28,7 @@
         </div>
         <div v-else>
             <TitleCom title="受罚对象概览表" />
-            <BaseTable height="300px" :dimension="dimension_3" :datas="datas" />
+            <BaseTable :dimension="dimension_3" :datas="datas" />
         </div>
     </PanelItem>
 </template>
@@ -42,7 +42,9 @@ import BaseTable from "../tables/BaseTable.vue"
 import PictorialBar from "../charts/PictorialBar.vue"
 import { B03 } from '../../apis.js'
 import colors from '../ConstColors.js'
-import { bank } from '../../icons/iconPath.js'
+import { bank, user } from '../../icons/iconPath.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B03",
@@ -53,18 +55,29 @@ export default {
         BaseTable,
         PictorialBar,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
             iconBank: bank,
+            iconUser: user,
             isChart: true,
+            loading: false,
+            showAll: false,
             dimension: [
                 {
                     label: "",
@@ -104,22 +117,34 @@ export default {
         }
     },
     mounted() {
-        this.getB03().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB03()
+        EventBus.$on('reportAssistantFilterChange', this.getB03)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB03() {
-            return B03({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            const dimensionEntity = window.sessionStorage.getItem("reportAssistantDimensionEntity")
+            console.log(dimensionEntity)
+            if (dimensionEntity === 'all') {
+                this.showAll = true
+            } else {
+                this.showAll = false
+            }
+            this.cantrol = B03({
+                date: JSON.parse(window.sessionStorage.getItem("reportAssistantTime")).value,
+                dimension_date: window.sessionStorage.getItem("reportAssistantDimensionDate"),
+                dimension_regulator: window.sessionStorage.getItem("reportAssistantDimensionRegulator"),
+                dimension_entity: window.sessionStorage.getItem("reportAssistantDimensionEntity"),
+                dimension_area: window.sessionStorage.getItem("reportAssistantDimensionArea"),
+                domain: window.sessionStorage.getItem('reportAssistantDomain'),
+                financial_institution_type: this.reportName === "银行群体分析" ? window.sessionStorage.getItem("reportAssistantGroupBank") : undefined,
+                financial_institution: this.reportName === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : this.reportName === "多家对比分析" ? window.sessionStorage.getItem("reportAssistantBanks") : undefined,
+            })
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         },
     }

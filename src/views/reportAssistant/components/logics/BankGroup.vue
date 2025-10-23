@@ -106,9 +106,7 @@ export default {
     margin-bottom: 18px;
     position: relative;
     .title-text{
-      font-family: OPPOSans;
       font-weight: 400;
-      font-style: Regular;
       font-size: 12px;
       line-height: 1;
       color: #09958D;
@@ -119,9 +117,7 @@ export default {
       top: 0;
       bottom: 0;
       color: #8E92A6;
-      font-family: OPPOSans;
       font-weight: 400;
-      font-style: Regular;
       font-size: 12px;
       line-height: 1;
       display: flex;

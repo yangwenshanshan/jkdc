@@ -1,23 +1,23 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
             <div>
                 <TitleCom title="罚单数（张）" />
-                <HorizontalBar style="height: 400px;width:386px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B19[theme]" :customOption="{
+                <HorizontalBar style="width:386px;" :dimension="dimension" :datas="datas" :colors="colors.B19[theme]"
+                    :customOption="{
                         grid: {
-                            top: 10,
+                            top: 5,
                             left: 140
                         },
                     }" />
             </div>
             <div>
                 <TitleCom title="案由数（个）" />
-                <HorizontalBar style="height: 400px;width:282px;" :dimension="dimension_2" :datas="datas"
-                    :colors="colors.B19[theme]" :customOption="{
+                <HorizontalBar style="width:282px;" :dimension="dimension_2" :datas="datas" :colors="colors.B19[theme]"
+                    :customOption="{
                         grid: {
-                            top: 10,
+                            top: 5,
                             left: 10
                         },
                         yAxis: {
@@ -27,10 +27,10 @@
             </div>
             <div>
                 <TitleCom title="罚没金额（万元）" />
-                <HorizontalBar style="height: 400px;width:282px;" :dimension="dimension_3" :datas="datas"
-                    :colors="colors.B19[theme]" :customOption="{
+                <HorizontalBar style="width:282px;" :dimension="dimension_3" :datas="datas" :colors="colors.B19[theme]"
+                    :customOption="{
                         grid: {
-                            top: 10,
+                            top: 5,
                             left: 10
                         },
                         yAxis: {
@@ -41,7 +41,7 @@
         </div>
         <div v-else>
             <TitleCom title="领域罚单机构分布表" />
-            <BaseTable height="400px" :dimension="dimension_4" :datas="datas" />
+            <BaseTable :dimension="dimension_4" :datas="datas" />
         </div>
     </PanelItem>
 </template>
@@ -55,6 +55,8 @@ import BaseTable from "../tables/BaseTable.vue"
 import HorizontalBar from "../charts/HorizontalBar.vue"
 import { B19 } from '../../apis.js'
 import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B19",
@@ -65,17 +67,26 @@ export default {
         BaseTable,
         HorizontalBar,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "银行类型",
@@ -129,23 +140,19 @@ export default {
         }
     },
     mounted() {
-        this.getB19().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB19()
+        EventBus.$on('reportAssistantDomainChange', this.getB19)
+        EventBus.$on('reportAssistantFilterChange', this.getB19)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB19() {
-            return B19({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
-                domain: window.sessionStorage.getItem('reportAssistantDomain'),
+            this.cantrol = B19(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

@@ -1,26 +1,39 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
             <div>
                 <TitleCom title="机构" />
-                <BarAndLine style="height: 164px;width:515px;" :dimension="dimension" :datas="datas"
+                <BarAndLine style="height: 164px;width:560px;" :dimension="dimension" :datas="datas"
                     :colors="colors.B04[theme]" :symbol="iconBank" :customOption="{
                         grid: {
                             top: 10,
-                            left: 140
+                            left: 30,
+                            right: 5,
+                        },
+                        legend: {
+                            show: false
                         },
                     }" />
             </div>
             <div>
                 <TitleCom title="个人" />
-                <BarAndLine style="height: 164px;width:515px;" :dimension="dimension_2" :datas="datas"
-                    :colors="colors.B04[theme]" :symbol="iconBank" />
+                <BarAndLine style="height: 164px;width:560px;" :dimension="dimension_2" :datas="datas"
+                    :colors="colors.B04[theme]" :symbol="iconBank" :customOption="{
+                        grid: {
+                            top: 10,
+                            left: 30,
+                            right: 5,
+                        },
+                        legend: {
+                            show: false
+                        },
+                    }" />
             </div>
         </div>
         <div v-else>
             <TitleCom title="受罚对象概览表" />
-            <BaseTable height="164px" :dimension="dimension_3" :datas="datas" />
+            <BaseTable :dimension="dimension_3" :datas="datas" />
         </div>
     </PanelItem>
 </template>
@@ -35,6 +48,8 @@ import BarAndLine from "../charts/BarAndLine.vue"
 import { B04 } from '../../apis.js'
 import colors from '../ConstColors.js'
 import { bank } from '../../icons/iconPath.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B04",
@@ -45,18 +60,27 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
             colors: colors,
             iconBank: bank,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "时段",
@@ -98,22 +122,18 @@ export default {
         }
     },
     mounted() {
-        this.getB04().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB04()
+        EventBus.$on('reportAssistantFilterChange', this.getB04)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB04() {
-            return B04({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B04(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }

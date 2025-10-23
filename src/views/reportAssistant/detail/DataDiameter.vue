@@ -2,7 +2,7 @@
   <div class="data-diameter">
     <div class="filter-title">
       <p class="title-text">本报告使用如下数据口径：如需调整，可点击</p>
-      <p class="title-btn" @click="dialogVisible = true">调整数据口径</p>
+      <p class="title-btn" @click="dialogVisible = true" :style="'background-color:' + theme ">调整数据口径</p>
     </div>
     <div class="filter-list">
       <div class="filter-item">
@@ -11,7 +11,7 @@
       </div>
       <div class="filter-item">
         <p class="item-title">监管机构范围：</p>
-        <p class="item-value">{{ regulator && regulator.label }}</p>
+        <p class="item-value">{{ regulator ? regulator.label === '全部' ? '金监局、人民银行、外管局' : regulator.label : '' }}</p>
       </div>
       <div class="filter-item">
         <p class="item-title">受罚对象：</p>
@@ -25,17 +25,18 @@
 
     <BankBaseDialog
       title="调整数据口径"
+      :title-color="theme"
       :visible.sync="dialogVisible"
       width="759px"
       :cancelVisible="false"
       @confirm="dialogConfirm"
     >
       <div class="dialog-main" v-if="dialogVisible">
-        <LabelRadio :value="dimension_date" :data="dimensionDate" @change="dateChange"></LabelRadio>
-        <LabelRadio :value="dimension_regulator" :data="dimensionRegulator" @change="regulatorChange"></LabelRadio>
-        <LabelRadio :value="dimension_entity" :data="dimensionEntity" @change="entityChange"></LabelRadio>
-        <LabelSelect :value="dimension_area" :data="dimensionArea" @change="areaChange" width="95px"></LabelSelect>
-        <LabelSelect :color="theme" :value="dimension_theme" :data="dimensionTheme" @change="themeChange" width="114px"></LabelSelect>
+        <LabelRadio :color="theme" :value="dimension_date" :data="dimensionDate" @change="dateChange"></LabelRadio>
+        <LabelRadio :color="theme" :value="dimension_regulator" :data="dimensionRegulator" @change="regulatorChange"></LabelRadio>
+        <LabelRadio :color="theme" :value="dimension_entity" :data="dimensionEntity" @change="entityChange"></LabelRadio>
+        <LabelSelect :color="theme" :value="dimension_area" :data="dimensionArea" @change="areaChange" width="95px"></LabelSelect>
+        <LabelSelect blockVisible :color="theme" :value="dimension_theme" :data="dimensionTheme" @change="themeChange" width="114px"></LabelSelect>
       </div>
     </BankBaseDialog>
   </div>

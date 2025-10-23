@@ -1,16 +1,19 @@
 <template>
     <div>
-        <Panel v-for="(item, index) in logicList" :key="index" :title="index + 1 + '.' + item.name" :titleId="item.id">
+        <Panel v-for="(item, index) in logicList" :key="index" :title="index + 1 + '.' + item.name"
+            :is_domain_required="item.is_domain_required" :id="item.id">
             <LazyLoad v-for="(ite, ind) in item.children" :key="ind">
-                <component :is="ite.index.manual_id" :subTitle="(index + 1) + '.' + (ind + 1) + '、' + ite.index.name" />
+                <component :is="ite.index.manual_id" :subTitle="(index + 1) + '.' + (ind + 1) + '、' + ite.index.name" :id="ite.id"/>
             </LazyLoad>
         </Panel>
+        <SanctionDetail :visible.sync="showSanctionDetail" :detail="sanctionDetail" />
     </div>
 </template>
 
 <script>
 import Panel from "./Panel.vue"
 import LazyLoad from "./LazyLoad.vue"
+import SanctionDetail from "./SanctionDetail.vue"
 import B01 from "./indexs/B01.vue"
 import B02 from "./indexs/B02.vue"
 import B03 from "./indexs/B03.vue"
@@ -26,6 +29,7 @@ import B12 from "./indexs/B12.vue"
 import B13 from "./indexs/B13.vue"
 import B14 from "./indexs/B14.vue"
 import B15 from "./indexs/B15.vue"
+import B16 from "./indexs/B16.vue"
 import B17 from "./indexs/B17.vue"
 import B18 from "./indexs/B18.vue"
 import B19 from "./indexs/B19.vue"
@@ -38,6 +42,9 @@ import B25 from "./indexs/B25.vue"
 import B26 from "./indexs/B26.vue"
 import B27 from "./indexs/B27.vue"
 
+import { getSanctionDetail } from '../apis.js'
+
+import { EventBus } from '../EventBus.js'
 
 
 export default {
@@ -45,6 +52,7 @@ export default {
     components: {
         Panel,
         LazyLoad,
+        SanctionDetail,
         B01,
         B02,
         B03,
@@ -60,6 +68,7 @@ export default {
         B13,
         B14,
         B15,
+        B16,
         B17,
         B18,
         B19,
@@ -72,28 +81,33 @@ export default {
         B26,
         B27,
     },
+    inject: ['activeReport'],
     props: {
-        reportName: {
-            type: String,
-            default: ""
-        }
     },
     data() {
         return {
-            logicList: []
+            logicList: [],
+            showSanctionDetail: false,
+            sanctionDetail: {}
         }
     },
     computed: {
+        reportName() {
+            return this.activeReport()?.name
+        }
     },
     created() {
+    },
+    mounted() {
+        EventBus.$on('sanctionidChange', this.sanctionidChange)
     },
     methods: {
         getLogicList() {
             this.logicList = []
             this.$nextTick(() => {
-                const { logic } = JSON.parse(window.sessionStorage.getItem("tableOfContents"))
-                const arr = logic.find(item => item.name === this.reportName).logics
-                this.logicList = this.listToTree(arr)
+                const logic = JSON.parse(window.sessionStorage.getItem("reportAssistantLogics"))
+                const currentReport = logic.find(item => item.name === this.reportName)
+                this.logicList = this.listToTree(currentReport.logics)
             })
         },
         listToTree(flatData) {
@@ -132,12 +146,27 @@ export default {
 
             sortTree(tree);
             return tree;
+        },
+        sanctionidChange(id) {
+            getSanctionDetail({
+                id,
+                fields: 'id,document_number,institution_name,regulator_name,reason_content,penalty_content'
+            }).run().then(res => {
+                this.sanctionDetail = {
+                    title: res.data.document_number,
+                    getPunished: res.data.institution_name,
+                    punish: res.data.regulator_name,
+                    illegalityContent: res.data.reason_content,
+                    punishmentContent: res.data.penalty_content
+                }
+            })
+            this.showSanctionDetail = true
         }
     },
     watch: {
         reportName: {
             handler(newVal, oldVal) {
-                if (newVal !== oldVal) {
+                if (newVal && newVal !== oldVal) {
                     this.getLogicList()
                 }
             },
@@ -148,18 +177,35 @@ export default {
 </script>
 
 <style scoped lang="scss">
-::v-deep{
-    .flex{
+::v-deep {
+    .flex {
         display: flex;
     }
-    .justify-between{
+
+    .justify-between {
         justify-content: space-between;
     }
-    .items-start{
+
+    .justify-start {
+        justify-content: flex-start;
+    }
+
+    .justify-end {
+        justify-content: flex-end;
+    }
+
+    .items-start {
         align-items: flex-start;
     }
-    .items-center{
+
+    .items-center {
         align-items: center;
     }
+}
+</style>
+
+<style>
+.my-chart-tooltip{ 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 </style>

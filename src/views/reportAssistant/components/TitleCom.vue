@@ -8,7 +8,7 @@
 <script>
 export default {
     name: "TitleCom",
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         title: {
             type: String,
@@ -16,6 +16,12 @@ export default {
         }
     },
     computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
         bgColor() {
             return this.theme === 'green' ? '#C8EDDD' : this.theme === 'blue' ? '#B4D8FF' : '#EED6D6'
         }

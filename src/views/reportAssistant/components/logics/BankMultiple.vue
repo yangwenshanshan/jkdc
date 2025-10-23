@@ -26,7 +26,7 @@
       width="710px"
       :cancel-visible="false"
       :confirm-text="'重新选择'"
-      @confirm="selectedBanksVisible = false"
+      @confirm="selectedBanksConfirm"
       :title="selectedBanksTitle"
     >
       <div class="selected-banks-content">
@@ -49,7 +49,7 @@
       :title="selectedBanksTitle"
     >
       <div class="sort-list">
-        <div class="sort-item" style="margin-bottom: 20px;">
+        <div class="sort-item sort-item-title" style="margin-bottom: 20px;">
           <p class="item-num-placeholder"></p>
           <div class="item-name">
             <p class="name-text-green">报告中对各家银行的展示顺序如下，您可点击箭头调整排序。</p>
@@ -57,20 +57,22 @@
           <div class="item-sort">调整排序</div>
           <div class="item-checkbox">是否高亮（单选）</div>
         </div>
-        <div class="sort-item" v-for="(item, index) in activeItems" :key="index">
-          <p class="item-num">{{ index + 1 }}</p>
-          <div class="item-name">
-            <p class="name-text">{{ item.name }}</p>
-          </div>
-          <div class="item-sort">
-            <div v-if="index === 0" style="width: 14px;height: 14px;"></div>
-            <img v-if="index !== 0" @click="sortClick(index - 1, index)" src="../../../../assets/images/penaltyReport/sort.png" alt="">
-            <img v-if="index !== activeItems.length - 1" @click="sortClick(index, index + 1)" style="transform: rotate(180deg);" src="../../../../assets/images/penaltyReport/sort.png" alt="">
-            <div v-if="index === activeItems.length - 1" style="width: 14px;height: 14px;"></div>
-          </div>
-          <div class="item-checkbox" @click="highlightIndex = index">
-            <img v-if="highlightIndex === index" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
-            <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
+        <div class="sort-items">
+          <div class="sort-item" v-for="(item, index) in activeItems" :key="index">
+            <p class="item-num">{{ index + 1 }}</p>
+            <div class="item-name">
+              <p class="name-text">{{ item.name }}</p>
+            </div>
+            <div class="item-sort">
+              <div v-if="index === 0" style="width: 14px;height: 14px;"></div>
+              <img v-if="index !== 0" @click="sortClick(index - 1, index)" src="../../../../assets/images/penaltyReport/sort.png" alt="">
+              <img v-if="index !== activeItems.length - 1" @click="sortClick(index, index + 1)" style="transform: rotate(180deg);" src="../../../../assets/images/penaltyReport/sort.png" alt="">
+              <div v-if="index === activeItems.length - 1" style="width: 14px;height: 14px;"></div>
+            </div>
+            <div class="item-checkbox" @click="highlightIndex = index">
+              <img v-if="highlightIndex === index" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
+              <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
+            </div>
           </div>
         </div>
       </div>
@@ -130,6 +132,12 @@ export default {
   mounted() {
   },
   methods: {
+    selectedBanksConfirm () {
+      this.selectedBanksVisible = false
+      this.$nextTick(() => {
+        this.dialogVisible = true
+      })
+    },
     showBankChooseDialog () {
       this.dialogVisible = true
     },
@@ -192,11 +200,10 @@ export default {
         grid-auto-rows: 18px;
         column-gap: 72px;
         row-gap: 12px;
-        height: 310px;
+        height: 354px;
         overflow: auto;
         padding: 0 124px;
         .bank-item{
-          font-family: OPPOSans;
           font-size: 14px;
           display: flex;
           align-items: center;
@@ -220,9 +227,7 @@ export default {
     margin-bottom: 18px;
     position: relative;
     .title-text{
-      font-family: OPPOSans;
       font-weight: 400;
-      font-style: Regular;
       font-size: 12px;
       line-height: 1;
       color: #09958D;
@@ -233,9 +238,7 @@ export default {
       top: 0;
       bottom: 0;
       color: #8E92A6;
-      font-family: OPPOSans;
       font-weight: 400;
-      font-style: Regular;
       font-size: 12px;
       line-height: 1;
       display: flex;
@@ -254,7 +257,14 @@ export default {
   }
   .sort-banks-dialog{
     .sort-list{
-      padding: 0 66px 0 108px;
+      .sort-items{
+        height: 318px;
+        overflow-y: auto;
+        padding: 0 66px 0 108px;
+      }
+      .sort-item-title{
+        padding: 0 66px 0 108px;
+      }
       .sort-item{
         display: flex;
         align-items: center;
@@ -274,6 +284,7 @@ export default {
           text-align: center;
           color: #919AA1;
           margin-right: 14px;
+          white-space: nowrap;
         }
         .item-name{
           width: 350px;
@@ -282,13 +293,11 @@ export default {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            font-family: OPPOSans;
             font-weight: 400;
             font-size: 14px;
             line-height: 18px;
           }
           .name-text-green{
-            font-family: OPPOSans;
             font-weight: 400;
             font-size: 12px;
             line-height: 16px;

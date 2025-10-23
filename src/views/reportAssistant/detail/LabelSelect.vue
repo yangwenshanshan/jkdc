@@ -1,14 +1,15 @@
 <template>
-  <div class="label-select">
+  <div class="label-select" :style="`--label-select-bg:${color}`">
     <p class="select-title">{{ data.name }}：</p>
     <el-select class="select_box"
       v-model="setlectValue"
       @change="change"
       popper-class="label-select_popper-custom"
-      :style="{ width: width, '--block-color': color}"
+      :style="{ width: width, '--block-color': blockVisible ? color : 'transparent' }"
     >
       <el-option
         v-for="item in data.chooses"
+        :style="`--label-select-bg:${color}`"
         :key="item.id"
         :label="item.short_name || item.name"
         :value="item.id">
@@ -22,6 +23,10 @@
 export default {
   name: "LabelSelect",
   props: {
+    blockVisible: {
+      type: Boolean,
+      default: false,
+    },
     color: {
       type: String,
       default: '',
@@ -78,6 +83,9 @@ export default {
     background-color: #E7ECF4 !important; // hover
     border-radius: 4px;
   }
+  .el-select-dropdown__item.selected{
+    color: var(--label-select-bg);
+  }
 }
 </style>
 <style lang="scss" scoped>
@@ -109,7 +117,7 @@ export default {
       border-color: rgba(0,0,0,0);
       font-size: 16px;
       padding: 0 32px 0 12px;
-      color: #09958D;
+      color: var(--label-select-bg);
       font-weight: bold;
       min-width: 60px;
       position: relative;

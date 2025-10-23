@@ -69,7 +69,7 @@ export default {
         blue: ['#62DDFF'],
         red: ['#CE5050'],
     },
-    B15: {  
+    B15: {
         green: ['#1FB8AF', '#FFBA58'],
         blue: ['#63AFFF', '#FFBA58'],
         red: ['#FF8E3D', '#FF0000'],
@@ -84,4 +84,9 @@ export default {
         blue: ['#D8EFFE', '#CFF1FF', '#CDE6FD', '#E8F5FE', '#E8F7FE', '#E6F1FF'],
         red: ['#FFE6E6', '#FFD7D7', '#FECBCB', '#FFF5F5', '#FFEEEE', '#FFEAEA'],
     },
+    Base: {
+        green: '#09958D',
+        blue: '#2C92FF',
+        red: '#DE2F2F',
+    }
 }

@@ -1,6 +1,6 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content">
-         b08
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
+        b08
     </PanelItem>
 </template>
 
@@ -12,7 +12,9 @@ import SwitchCom from "../SwitchCom.vue"
 import BaseTable from "../tables/BaseTable.vue"
 import BarAndLine from "../charts/BarAndLine.vue"
 import { B08 } from '../../apis.js'
-import colors from '../ConstColors.js' 
+import colors from '../ConstColors.js'
+import http from '../../http.js'
+import { EventBus } from '../../EventBus.js'
 
 export default {
     name: "B08",
@@ -23,17 +25,26 @@ export default {
         BaseTable,
         BarAndLine,
     },
-    inject: ['theme'],
+    inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
         subTitle: {
             type: String,
             default: '',
         }
     },
+    computed: {
+        theme() {
+            return this.themeFn()
+        },
+        reportName() {
+            return this.activeReport().name
+        },
+    },
     data() {
         return {
-            colors: colors, 
+            colors: colors,
             isChart: true,
+            loading: true,
             dimension: [
                 {
                     label: "时段",
@@ -44,28 +55,24 @@ export default {
                     prop: "institution_count",
                     type: "line"
                 },
-            ], 
+            ],
             datas: [],
             content: '',
         }
     },
     mounted() {
-        this.getB08().run().then(res => {
-            console.log(res)
-            this.datas = res.data
-            this.content = res.summary.description
-        })
+        this.getB08()
+        EventBus.$on('reportAssistantFilterChange', this.getB08)
+        EventBus.$on('reportAssistantCancel', () => http.cancel(this.cantrol.key))
     },
     methods: {
         getB08() {
-            return B08({
-                date: "2024",
-                dimension_date: "date_issued",
-                dimension_regulator: "c432a34b-7b29-418f-ad9c-6b03cab7ea34,6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,3e295f3c-dc5f-456c-b42a-cc63f4ee6320",
-                dimension_entity: "all",
-                dimension_area: "all",
-                financial_institution_type: "",
-                financial_institution: "",
+            this.cantrol = B08(this.getParams())
+            this.cantrol.run().then(res => {
+                this.datas = res.data
+                this.content = res.summary.description
+            }).finally(() => {
+                this.loading = false
             })
         }
     }
