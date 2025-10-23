@@ -131,6 +131,7 @@ export default {
     this.getReportLogicApi()
   },
   mounted() {
+    this.$emit('changeTab', '/reportAssistant')
   },
   methods: {
     timePeriodChange (time) {

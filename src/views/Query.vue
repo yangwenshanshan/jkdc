@@ -819,7 +819,7 @@ export default {
     this.getOrgList(1);
     this.getOrgList(2);
     // this.getFunctionalAreas();
-    this.$emit("changeTab", "/query");
+    this.$emit("changeTab", "/ticket");
     let target;
     let ts = this;
     this.$refs.pageContent.onmousemove = function (e) {

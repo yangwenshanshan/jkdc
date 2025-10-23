@@ -7,7 +7,7 @@
         </div>
         <div class="aside-right">
           <p class="right-title">目录</p>
-          <p class="self-text" :class="item.isTitle ? 'is-parent' : 'is-children'" v-for="(item, index) in activeType.logics" :key="'logics_' + index">
+          <p class="self-text" :class="item.isTitle ? 'is-parent' : 'is-children'" v-for="(item, index) in activeType.logics" :key="'logics_' + index" @click="gologicItem(item)">
             <span>{{ item.header }}{{ item.sub ? `.${item.sub}` : ''}}、</span>
             <span>{{ item.name }}</span>
           </p>
@@ -72,6 +72,14 @@ export default {
   mounted() {
   },
   methods: {
+    gologicItem (item) {
+      const block = document.querySelector(`.logic_${item.header}${item.sub ? `_${item.sub}` : ''}`)
+      block.scrollIntoView({
+        behavior: "smooth",
+        block: 'start',
+        inline: 'start'
+      })
+    },
     reportChange(index) {
       this.activeIndex = index
       EventBus.$emit('reportAssistantCancel')
@@ -150,6 +158,7 @@ export default {
         line-height: 18px;
         margin-bottom: 12px;
         color: #10163C;
+        cursor: pointer;
       }
       .is-children{
         display: flex;

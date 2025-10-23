@@ -1,9 +1,9 @@
 <template>
     <div>
         <Panel v-for="(item, index) in logicList" :key="index" :title="index + 1 + '.' + item.name"
-            :is_domain_required="item.is_domain_required" :id="item.id">
-            <LazyLoad v-for="(ite, ind) in item.children" :key="ind">
-                <component :is="ite.index.manual_id" :subTitle="(index + 1) + '.' + (ind + 1) + '、' + ite.index.name" :id="ite.id"/>
+            :is_domain_required="item.is_domain_required" :id="item.id" :class="`logic_${item.header}`">
+            <LazyLoad v-for="(ite, ind) in item.children" :key="ind" :class="`logic_${ite.header}_${ite.sub}`">
+                <component :is="ite.index.manual_id" :subTitle="(index + 1) + '.' + (ind + 1) + '、' + ite.index.name" :id="ite.id" />
             </LazyLoad>
         </Panel>
         <SanctionDetail :visible.sync="showSanctionDetail" :detail="sanctionDetail" />

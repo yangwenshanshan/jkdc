@@ -15,9 +15,8 @@
         <router-link to="/regulation" :class="{ active: tab === '/regulation' }"
           >金融法规</router-link
         >
-        
-        <el-dropdown class="el-link" trigger="hover">
-          <span class="el-dropdown-link">
+        <el-dropdown style="margin-right: 30px;" trigger="hover">
+          <span class="el-dropdown-link" :class="{ active: tab === '/ticket' || tab === '/charts' || tab === '/reportAssistant' }">
             监管处罚<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <!-- 下拉菜单内容 -->
@@ -213,13 +212,31 @@ header {
     text-decoration: underline;
   }
 
-  .el-link {
-    margin-right: 30px;
-  }
   .el-dropdown-link {
     cursor: pointer;
     color: #fff;
     font-size: 18px;
+    padding: 0 7px 8px;
+    position: relative;
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: transparent;
+      transition: 0.25s;
+    }
+    &.active:after {
+      content: "";
+      background: #09958d;
+    }
+    &:hover:after {
+      content: "";
+      background: #09958d;
+    }
   }
 
 }
