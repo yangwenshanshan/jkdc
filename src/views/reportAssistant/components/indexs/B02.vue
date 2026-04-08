@@ -3,7 +3,7 @@
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start" style="overflow: auto;">
             <div v-for="(item) in config" :key="item.key"
-                :style="{ flex: 'none', marginRight: '15px', width: (dimension.length - 1) * datas[item.key].length * 30 + 120 + 'px' }">
+                :style="{ flex: 'none', marginRight: '15px', width: (dimension.length - 1) * datas[item.key].length * 30 + 170 + 'px' }">
                 <TitleCom :title="item.label" />
                 <BarAndLine style="height: 196px;" :dimension="dimension" :datas="datas[item.key]"
                     :colors="colors.B02[theme]" :customOption="{
@@ -98,6 +98,25 @@ export default {
                     },]
                 },
                 {
+                    label: "人民银行",
+                    labelClassName: colors.ColorfulTable[this.theme][2],
+                    children: [{
+                        label: "罚单数",
+                        prop: "ticket_count_renminyinhang",
+                        labelClassName: colors.ColorfulTable[this.theme][5],
+                    },
+                    {
+                        label: "案由数",
+                        prop: "reason_count_renminyinhang",
+                        labelClassName: colors.ColorfulTable[this.theme][5],
+                    },
+                    {
+                        label: "罚没金额",
+                        prop: "total_amount_renminyinhang",
+                        labelClassName: colors.ColorfulTable[this.theme][5],
+                    },]
+                },
+                {
                     label: "外管局",
                     labelClassName: colors.ColorfulTable[this.theme][1],
                     children: [{
@@ -116,25 +135,6 @@ export default {
                         labelClassName: colors.ColorfulTable[this.theme][4],
                     },]
                 },
-                {
-                    label: "人民银行",
-                    labelClassName: colors.ColorfulTable[this.theme][2],
-                    children: [{
-                        label: "罚单数",
-                        prop: "ticket_count_renminyinhang",
-                        labelClassName: colors.ColorfulTable[this.theme][5],
-                    },
-                    {
-                        label: "案由数",
-                        prop: "reason_count_renminyinhang",
-                        labelClassName: colors.ColorfulTable[this.theme][5],
-                    },
-                    {
-                        label: "罚没金额",
-                        prop: "total_amount_renminyinhang",
-                        labelClassName: colors.ColorfulTable[this.theme][5],
-                    },]
-                }
             ]
         },
     },

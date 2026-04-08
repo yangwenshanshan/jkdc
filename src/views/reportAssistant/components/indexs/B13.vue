@@ -1,18 +1,18 @@
 <template>
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <div class="flex justify-between items-start">
-            <div>
+            <div style="width: 60%;">
                 <TitleCom title="领域趋势图" />
-                <BarAndLine style="height: 276px;width:670px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B13[theme]" :customOption="{
+                <BarAndLine style="height: 276px;" :dimension="dimension" :datas="datas" :colors="colors.B13[theme]"
+                    :customOption="{
                         legend: {
                             show: true,
                         }
                     }" />
             </div>
-            <div>
+            <div style="width: 35%;">
                 <TitleCom title="领域趋势表" />
-                <BaseTable style="width:388px;" show-summary :dimension="dimension" :datas="datas" />
+                <BaseTable show-summary :dimension="dimension" :datas="datas" />
             </div>
         </div>
     </PanelItem>

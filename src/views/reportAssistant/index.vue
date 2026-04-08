@@ -171,7 +171,7 @@ export default {
       sessionStorage.setItem("reportAssistantTime", JSON.stringify(this.timePeriod))
       sessionStorage.setItem("reportAssistantGroupBank", this.groupBank?.id || '')
       sessionStorage.setItem("reportAssistantSingleBank", this.singleBank?.id || '')
-      sessionStorage.setItem("reportAssistantBanks", this.multipleBanks?.map(item => item.id).join(',') || '')
+      sessionStorage.setItem("reportAssistantBanks", JSON.stringify(this.multipleBanks || []))
       sessionStorage.setItem("reportAssistantMainBank", JSON.stringify(this.multipleActive || {}))
  
       this.$router.push({

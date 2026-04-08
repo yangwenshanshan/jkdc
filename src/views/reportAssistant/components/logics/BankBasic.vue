@@ -126,9 +126,9 @@ export default {
       this.$emit('choose')
     },
     changeAllChecked () {
-      if (this.maskedVisible) {
-        return
-      }
+      // if (this.maskedVisible) {
+      //   return
+      // }
       if (this.allChecked) {
         this.allChecked = false
         this.children.forEach(el => {

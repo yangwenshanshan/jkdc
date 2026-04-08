@@ -5,7 +5,7 @@
         <BarAndLine v-if="isChart" style="height: 340px;" :dimension="dimension" :datas="datas"
             :colors="colors.B06[theme]" :customOption="{
                 grid: {
-                    bottom: 50
+                    bottom: 70
                 },
                 xAxis: {
                     axisLabel: {
@@ -63,7 +63,7 @@ export default {
             dimension: [
                 {
                     label: "省/市",
-                    prop: "area_name",
+                    prop: "area_short_name",
                 },
                 {
                     label: "罚单数（张）",
@@ -91,7 +91,7 @@ export default {
             this.cantrol.run().then(res => {
                 this.datas = res.data.map(item => ({
                     ...item,
-                    area_name: item.area_name.replace(/[省|市|回族自治区|维吾尔族自治区|壮族自治区|自治区]/g, '')
+                    area_short_name: item.area_short_name || item.area_name
                 }))
                 this.content = res.summary.description
             }).finally(() => {

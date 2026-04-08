@@ -8,6 +8,8 @@ import clamp from "clamp-js";
 Vue.prototype.$clamp = clamp;
 import "./assets/font/iconfont";
 import "./assets/font/iconfont.css";
+import waterfall from 'vue-waterfall2'
+Vue.use(waterfall)
 
 import ElementUI from "element-ui";
 import "./assets/css/element-variables.scss";
@@ -74,7 +76,7 @@ Vue.prototype.request = function(path, data, method = "post", responseType) {
         axios(config)
             .then(res => {
                 if (res.data.code === 401) {
-                    localStorage.removeItem("user");
+                    localStorage.clear();
                     if (this.$route.path !== "/login") {
                         this.$message.error("登录状态过期");
                         this.$router.replace("/login");
@@ -172,7 +174,7 @@ Vue.prototype.requestSaas = function(path, data, method = "post", responseType) 
         axios(config)
             .then(res => {
                 if (res.data.code === 401) {
-                    localStorage.removeItem("user");
+                    localStorage.clear();
                     if (this.$route.path !== "/login") {
                         this.$message.error("登录状态过期");
                         this.$router.replace("/login");
@@ -261,7 +263,7 @@ Vue.prototype.requestChat = function(path, data, method = "post", responseType) 
         axios(config)
             .then(res => {
                 if (res.data.code === 401) {
-                    localStorage.removeItem("user");
+                    localStorage.clear();
                     if (this.$route.path !== "/login") {
                         this.$message.error("登录状态过期");
                         this.$router.replace("/login");
@@ -335,7 +337,7 @@ function refreshToken(success, fail) {
                 callback[0]()
             }
         }).catch((err) => {
-            localStorage.removeItem("user");
+            localStorage.clear();
             app.$message.error("登录状态过期");
             app.$router.replace("/login");
             while (refreshCallback.length) {

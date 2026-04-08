@@ -6,6 +6,7 @@
       :options="options"
       :children="children"
       @choose="showBankChooseDialog"
+      ref="bankBasic"
     >
       <div class="item-title">
         <p class="title-text">{{ activeItem ? activeItem.name : options.placeholder }}</p>
@@ -15,13 +16,13 @@
         </div>
       </div>
     </BankBasic>
-    <BankRadioDialog :data="groupData" title="选择银行类型（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
+    <BankRadioTypeDialog :data="groupData" title="选择银行类型（单选）" :visible.sync="dialogVisible" @confirm="dialogSubmit" />
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
-import BankRadioDialog from './BankRadioDialog.vue'
+import BankRadioTypeDialog from './BankRadioTypeDialog.vue'
 import step22 from '../../../../assets/images/penaltyReport/step2-2.png'
 import { flattenAndAddInfoTree } from '../logics/data'
 import { getBankGroupList } from '../../apis'
@@ -30,7 +31,7 @@ export default {
   name: "BankGroup",
   components: {
     BankBasic,
-    BankRadioDialog
+    BankRadioTypeDialog
   },
   props: {
     data: {
@@ -71,6 +72,7 @@ export default {
     })
   },
   mounted() {
+    this.$refs.bankBasic.changeAllChecked()
   },
   methods: {
     showBankChooseDialog () {
@@ -86,10 +88,12 @@ export default {
     },
     basicChange (val) {
       this.logics = val
-      this.$emit('change', {
-        bank: this.activeItem,
-        logics: this.logics
-      })
+      if (this.activeItem) {
+        this.$emit('change', {
+          bank: this.activeItem,
+          logics: this.logics
+        })
+      }
     }
   },
 };

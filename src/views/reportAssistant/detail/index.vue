@@ -7,7 +7,7 @@
         </div>
         <div class="aside-right">
           <p class="right-title">目录</p>
-          <p class="self-text" :class="item.isTitle ? 'is-parent' : 'is-children'" v-for="(item, index) in activeType.logics" :key="'logics_' + index" @click="gologicItem(item)">
+          <p class="self-text" :class="{ 'is-parent': item.isTitle, 'is-children': !item.isTitle, 'table-active': tableOfContentId === `logic_${item.header}${item.sub ? `_${item.sub}` : ''}` }" v-for="(item, index) in activeType.logics" :key="'logics_' + index" @click="gologicItem(item)">
             <span>{{ item.header }}{{ item.sub ? `.${item.sub}` : ''}}、</span>
             <span>{{ item.name }}</span>
           </p>
@@ -20,7 +20,7 @@
             <DataDiameter @change="filterChange"></DataDiameter>
           </div>
           <el-main class="main-container">
-            <Report />
+            <Report @showItem="showItem" />
           </el-main>
         </div>
       </el-container>
@@ -53,6 +53,7 @@ export default {
       time: {},
       activeIndex: -1,
       theme: 'green',
+      tableOfContentId: ''
     };
   },
   computed: { 
@@ -72,13 +73,12 @@ export default {
   mounted() {
   },
   methods: {
+    showItem (id) {
+      this.tableOfContentId = id
+    },
     gologicItem (item) {
       const block = document.querySelector(`.logic_${item.header}${item.sub ? `_${item.sub}` : ''}`)
-      block.scrollIntoView({
-        behavior: "smooth",
-        block: 'start',
-        inline: 'start'
-      })
+      block.scrollIntoView()
     },
     reportChange(index) {
       this.activeIndex = index
@@ -100,9 +100,9 @@ export default {
         dimension_regulator: window.sessionStorage.getItem("reportAssistantDimensionRegulator"),
         dimension_entity: window.sessionStorage.getItem("reportAssistantDimensionEntity"),
         dimension_area: window.sessionStorage.getItem("reportAssistantDimensionArea"),
-        domain: window.sessionStorage.getItem('reportAssistantDomain'),
+        domain: window.sessionStorage.getItem('reportAssistantDomain') || undefined,
         financial_institution_type: this.activeType.name === "银行群体分析" ? window.sessionStorage.getItem("reportAssistantGroupBank") : undefined,
-        financial_institution: this.activeType.name === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : this.activeType.name === "多家对比分析" ? window.sessionStorage.getItem("reportAssistantBanks") : undefined,
+        financial_institution: this.activeType.name === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : this.activeType.name === "多家对比分析" ? JSON.parse(window.sessionStorage.getItem("reportAssistantBanks"))?.map(item => item.id).join(',') : undefined,
       }
     }
   },
@@ -113,10 +113,12 @@ export default {
 .report-assistant-detail{
   background-color: #EFF1F9;
   padding-top: 20px;
-  // .detail-main{
-  //   // width: 1616px;
-  //   // margin: 0 auto;
-  // }
+  position: relative;
+  overflow: hidden;
+  min-width: 1616px;
+  .detail-main{
+    width: 100%;
+  }
   .aside-content{
     display: flex;
     // padding-top: 20px;
@@ -187,6 +189,9 @@ export default {
           transform: rotate(45deg);
           margin-right: 8px;
         }
+      }
+      .table-active{
+        color: #09958D;
       }
     }
   }

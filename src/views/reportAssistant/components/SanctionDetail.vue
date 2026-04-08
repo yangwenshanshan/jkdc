@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="illegalityContent">
-                <p class="label">违法事实：</p>
+                <p class="label">违规事实：</p>
                 <div>
                     <p v-html="detail.illegalityContent?.replaceAll('；', '；<br/>')"></p>
                 </div>

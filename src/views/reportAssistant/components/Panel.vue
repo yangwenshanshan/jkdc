@@ -69,26 +69,19 @@ export default {
     mounted() {
         if (this.is_domain_required) {
             this.getDropdownItems()
+            EventBus.$on('reportAssistantFilterChange', this.getDropdownItems)
         }
     },
     methods: {
         getDropdownItems() {
-            getAvailableDomainList({
-                date: JSON.parse(window.sessionStorage.getItem("reportAssistantTime")).value,
-                dimension_date: window.sessionStorage.getItem("reportAssistantDimensionDate"),
-                dimension_regulator: window.sessionStorage.getItem("reportAssistantDimensionRegulator"),
-                dimension_entity: window.sessionStorage.getItem("reportAssistantDimensionEntity"),
-                dimension_area: window.sessionStorage.getItem("reportAssistantDimensionArea"),
-                financial_institution_type: this.reportName === "银行群体分析" ? window.sessionStorage.getItem("reportAssistantGroupBank") : undefined,
-                financial_institution: this.reportName === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : this.reportName === "多家对比分析" ? window.sessionStorage.getItem("reportAssistantBanks") : undefined,
-            }).run().then(res => {
+            getAvailableDomainList(this.getParams()).run().then(res => {
                 this.dropdownItems = res.data
                 this.handleCommand(this.dropdownItems[0]?.domain_id)
             })
         },
         handleCommand(id) {
             this.activeDomainId = id
-            window.sessionStorage.setItem('reportAssistantDomain', id)
+            window.sessionStorage.setItem('reportAssistantDomain', id || '')
             EventBus.$emit('reportAssistantDomainChange')
         },
     },
@@ -108,7 +101,6 @@ export default {
     padding: 34px;
     background-color: #fff;
     border-radius: 6px;
-    // width: 1202px;
     margin: 0 auto 20px;
     box-sizing: border-box;
 
@@ -148,5 +140,6 @@ export default {
 .panel-dropdown-menu {
     max-height: 200px;
     overflow-y: auto;
+    border: 0;
 }
 </style>

@@ -7,13 +7,13 @@
     :confirm-text="confirmText"
     @confirm="confirm"
   >
-    <div class="tree-content" v-loading="loading">
+    <div class="tree-content">
       <div class="contet-left">
         <p class="left-title">选择对比银行(上限30家)</p>
         <div class="left-input">
-          <input type="text" v-model="inputValue" placeholder="请输入需查找的银行名称" @input="inputChange">
+          <input type="text" v-model="inputValue" placeholder="请输入需查找的银行名称" @input="debouncedInputHandler">
         </div>
-        <div class="left-main">
+        <div class="left-main" v-loading="loading">
           <div class="bank-group-item" v-for="(item, index) in tree" :key="index">
             <div class="item-result" v-if="item.id === 'search_results'">
               <p>机构名称</p>
@@ -50,6 +50,7 @@
 </template>
 <script>
 import BankBaseDialog from '../BankBaseDialog.vue'
+import { getBankSingleList } from '../../apis'
 import { getBankTreeList } from './data';
 
 export default {
@@ -72,7 +73,8 @@ export default {
       loading: false,
       checkedList: [],
       tempCheckedList: [],
-      confirmText: '下一步'
+      confirmText: '下一步',
+      timeout: null,
     };
   },
   watch: {
@@ -87,13 +89,28 @@ export default {
     }
   },
   methods: {
+    debouncedInputHandler () {
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        this.inputChange();
+      }, 500);
+    },
     inputChange () {
       if (this.inputValue) {
-        const checkedBankIds = this.tempCheckedList.map(item => item.id);
-        const matchedBanks = [];
-        this.tempTree.forEach(group => {
-          if (group.children && group.children.length) {
-            const matchingBanks = group.children.filter(bank => 
+        this.loading = true
+        getBankSingleList({
+          fields: 'id,name,manual_id',
+          sort: 'manual_id',
+          limit: 20,
+          'filter[_and][0][type][parent][_eq]': '9f1f2c25-130c-4b4a-a14b-bb6ba81911a6',
+          'filter[_and][1][name][_contains]': this.inputValue
+        }).run().then(res => {
+          this.loading = false
+          const checkedBankIds = this.tempCheckedList.map(item => item.id);
+          const matchedBanks = [];
+          const resData = res.data
+          if (resData && resData.length) {
+            const matchingBanks = resData.filter(bank => 
               bank.name.toLowerCase().includes(this.inputValue.toLowerCase())
             );
             matchingBanks.forEach(bank => {
@@ -103,15 +120,15 @@ export default {
               matchedBanks.push(bank);
             });
           }
-        });
-        const filteredTree = [{
-          id: 'search_results',
-          name: '搜索结果',
-          opened: true,
-          children: matchedBanks
-        }];
-        
-        this.tree = filteredTree;
+          const filteredTree = [{
+            id: 'search_results',
+            name: '搜索结果',
+            opened: true,
+            children: matchedBanks
+          }];
+
+          this.tree = filteredTree;
+        })
       } else {
         const checkedBanks = [ ...this.tempCheckedList ];
         this.tree = [ ...this.tempTree ]

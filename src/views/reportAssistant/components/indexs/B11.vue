@@ -100,8 +100,6 @@ export default {
                         return h('div', {}, [
                             h('span', {
                                 style: {
-                                    textDecoration: 'underline',
-                                    decorationColor: '#4E70F0',
                                     color: '#4E70F0',
                                     cursor: 'pointer',
                                 },

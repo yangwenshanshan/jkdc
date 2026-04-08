@@ -82,8 +82,13 @@ export const B26 = (params) => {
 export const B27 = (params) => {
     return http.get(URL + '/ticket-report/b27', { params })
 }
+export const B28 = (params) => {
+    return http.get(URL + '/ticket-report/b28', { params })
+}
 export const getAvailableDomainList = (params) => http.get(URL + '/ticket-report/available-domain', { params })
 export const getSanctionDetail = (params) => http.get(URL + `/items/cl_ticket/${params.id}`, { params })
+export const getAnalysisReportDetail = (params) => http.get(URL + '/ticket-report/tickets', { params })
+export const getReportDescription = (params) => http.get(URL + '/ticket-report/params-description', { params })
 
 export const getReportLogic = (params) => http.get(URL + '/items/cl_ticket_report_logic', { params })
 export const getBankGroupList = (params) => http.get(URL + '/items/cl_financial_institution_type', { params })

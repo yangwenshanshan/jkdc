@@ -1,5 +1,5 @@
 <template>
-    <div class="panel_item" v-loading="loading">
+    <div class="panel_item" v-loading="loading" element-loading-background="#fff">
         <h3 v-if="subTitle" :style="{ '--sub-title-icon-color1': iconColor1, '--sub-title-icon-color2': iconColor2 }">
             <SubTitleIcon class="sub_title_icon" />
             <span>{{ subTitle }}</span>
@@ -33,7 +33,7 @@ export default {
         loading: {
             type: Boolean,
             default: true
-        }
+        },
     },
     data() {
         return {
@@ -61,6 +61,8 @@ export default {
 
 <style lang="scss" scoped>
 .panel_item {
+    margin-bottom: 10px;
+
     h3 {
         font-size: 16px;
         line-height: 1;

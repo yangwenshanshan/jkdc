@@ -1,5 +1,8 @@
 <template>
-    <div ref="chartRef" v-resize="handleResize"></div>
+    <div style="width: 100%; height: 100%;">
+        <div v-show="!noData" ref="chartRef" v-resize="handleResize" style="width: 100%; height: 100%;"></div>
+        <NoData :show="noData" />
+    </div>
 </template>
 
 <script>
@@ -7,11 +10,15 @@ import merge from 'lodash/merge'
 import { noDataGraphic, defaultConfig } from './configGenerate.js'
 import * as echarts from 'echarts'
 import resize from '@/directives/resize'
+import NoData from '../NoData.vue'
 
 export default {
     name: "BarAndLine",
     directives: {
         resize
+    },
+    components: {
+        NoData
     },
     props: {
         title: {
@@ -76,7 +83,7 @@ export default {
                     return {
                         type: 'value',
                         position: index === 0 ? 'left' : 'right',
-                        offset: index === 0 ? 0 : -(index - 1) * 54,
+                        offset: index === 0 ? 0 : (index - 1) * 54,
                         axisLine: {
                             show: true
                         },
@@ -84,12 +91,15 @@ export default {
                             onZero: false,
                         },
                         splitLine: {
-                            show: true,
-                            lineStyle: {
-                                color: '#E9E9E9',
-                                type: 'dashed'
-                            }
+                            show: false
                         }
+                        // splitLine: {
+                        //     show: true,
+                        //     lineStyle: {
+                        //         color: '#E9E9E9',
+                        //         type: 'dashed'
+                        //     }
+                        // }
                     }
                 }),
                 series: this.dimension.slice(1).map((item, index) => {

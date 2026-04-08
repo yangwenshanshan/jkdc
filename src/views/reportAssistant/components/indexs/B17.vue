@@ -1,18 +1,18 @@
 <template>
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <div class="flex justify-between items-start">
-            <div>
+            <div style="width: 50%;">
                 <TitleCom title="罚单数与金额概览图" />
-                <BarAndLine style="height: 200px;width:530px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B17[theme]" :customOption="{
+                <BarAndLine style="height: 200px;" :dimension="dimension" :datas="datas" :colors="colors.B17[theme]"
+                    :customOption="{
                         legend: {
                             show: true,
                         }
                     }" />
             </div>
-            <div>
+            <div style="width: 45%;">
                 <TitleCom title="罚单数与金额概览表" />
-                <BaseTable style="width:500px;" show-summary :dimension="dimension" :datas="datas" />
+                <BaseTable show-summary :dimension="dimension" :datas="datas" />
             </div>
         </div>
     </PanelItem>
@@ -75,7 +75,7 @@ export default {
                     type: "bar",
                 },
                 {
-                    label: "罚没金额（万元）",
+                    label: "案由金额（万元）",
                     prop: "total_amount",
                     type: "line",
                 },
@@ -95,7 +95,7 @@ export default {
             this.cantrol = B17(this.getParams())
             this.cantrol.run().then(res => {
                 this.datas = res.data
-                this.content = res.summary
+                this.content = res.summary.description
             }).finally(() => {
                 this.loading = false
             })

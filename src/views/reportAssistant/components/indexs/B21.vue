@@ -2,11 +2,10 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div class="flex justify-between items-start">
-            <div>
+            <div style="width: 48%;">
                 <TitleCom :title="isChart ? '罚单数排名图' : '罚单数排名表'" />
-                <HorizontalBar v-if="isChart" :style="{ height: height, width: '516px' }" :dimension="dimension"
-                    :datas="datas" :colors="colors.B21[theme]" :mainBank="mainBankData.name" :height="height"
-                    :customOption="{
+                <HorizontalBar v-if="isChart" :style="{ height: height, minHeight: '134px' }" :dimension="dimension"
+                    :datas="datas" :colors="colors.B21[theme]" :mainBank="mainBankData.name" :customOption="{
                         grid: {
                             top: 10,
                             left: 100
@@ -55,10 +54,10 @@
                 <BaseTable v-else style="width:516px;" :dimension="dimension_table" :datas="datas"
                     :row-class-name="rowClass" />
             </div>
-            <div>
-                <TitleCom :title="isChart ? '罚单金额排名图' : '罚单金额排名表'" />
-                <HorizontalBar v-if="isChart" :style="{ height: height, width: '516px' }" :mainBank="mainBankData.name"
-                    :dimension="dimension_2" :datas="datas_2" :colors="colors.B21[theme]" :height="height"
+            <div style="width: 48%;">
+                <TitleCom :title="isChart ? '罚没金额排名图' : '罚没金额排名表'" />
+                <HorizontalBar v-if="isChart" :style="{ height: height, minHeight: '134px' }"
+                    :mainBank="mainBankData.name" :dimension="dimension_2" :datas="datas_2" :colors="colors.B21[theme]"
                     :customOption="{
                         grid: {
                             top: 10,
@@ -198,7 +197,7 @@ export default {
                     }
                 },
                 {
-                    label: "罚单金额（万元）",
+                    label: "罚单数（张）",
                     prop: "ticket_count",
                 },
             ],
@@ -209,7 +208,7 @@ export default {
                     prop: "bank_name",
                 },
                 {
-                    label: "罚单金额排名",
+                    label: "罚没金额排名",
                     prop: "total_amount",
                 },
             ],
@@ -238,7 +237,7 @@ export default {
                     }
                 },
                 {
-                    label: "罚单金额排名",
+                    label: "罚没金额（万元）",
                     prop: "total_amount",
                 },
             ],

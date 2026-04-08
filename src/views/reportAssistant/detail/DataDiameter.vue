@@ -71,9 +71,9 @@ export default {
       dialogTheme: null,
       dimension_theme: 'green',
       dimension_area: '',
-      dimension_date: 'date_issued',
+      dimension_date: 'date_published',
       dimension_regulator: '6ba9fa36-6f93-4bb1-aa3e-54d06a6b937f,c432a34b-7b29-418f-ad9c-6b03cab7ea34,3e295f3c-dc5f-456c-b42a-cc63f4ee6320',
-      dimension_entity: 'institution',
+      dimension_entity: 'all',
       dimensionDate: {
         name: '日期口径',
         key: 'dimension_date',
@@ -115,7 +115,7 @@ export default {
         key: 'dimension_entity',
         chooses: [
           {
-            label: '仅机构',
+            label: '机构',
             value: 'institution'
           },
           {

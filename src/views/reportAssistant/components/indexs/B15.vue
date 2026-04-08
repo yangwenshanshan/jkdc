@@ -1,16 +1,17 @@
 <template>
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 40px auto;">
+        <div style="grid-template-columns: calc(50% - 20px) calc(50% - 20px); gap: 40px;"
+            :style="{ display: datas.length > 1 ? 'grid' : 'block' }">
             <div v-for="(item, index) in datas" :key="index">
                 <TitleCom :title="item.problem_type_name" />
-                <BarAndLine v-if="isChart" style="height: 164px;width:550px;" :dimension="dimension"
-                    :datas="item.trend_data" :colors="colors.B15[theme]" :customOption="{
+                <BarAndLine v-if="isChart" style="height: 164px;" :dimension="dimension" :datas="item.trend_data"
+                    :colors="colors.B15[theme]" :customOption="{
                         legend: {
                             show: true,
                         }
                     }" />
-                <BaseTable v-else style="width:516px;" :dimension="dimension" :datas="item.trend_data" />
+                <BaseTable v-else :dimension="dimension" :datas="item.trend_data" />
             </div>
         </div>
     </PanelItem>
@@ -35,7 +36,7 @@ export default {
         TitleCom,
         SwitchCom,
         BaseTable,
-        BarAndLine,
+        BarAndLine
     },
     inject: ['themeFn', 'activeReport', 'getParams'],
     props: {
@@ -87,7 +88,7 @@ export default {
         getB15() {
             this.cantrol = B15(this.getParams())
             this.cantrol.run().then(res => {
-                this.datas = res.data
+                this.datas = res.data.length > 0 ? res.data : [{}]
                 this.content = res.summary.description
             }).finally(() => {
                 this.loading = false

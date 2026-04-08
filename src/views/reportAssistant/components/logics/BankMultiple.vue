@@ -6,6 +6,7 @@
       :options="options"
       :children="children"
       @choose="showBankChooseDialog"
+      ref="bankBasic"
     >
       <div class="item-title">
         <p class="title-text">已勾选{{ activeItems.length }}家银行</p>
@@ -69,7 +70,7 @@
               <img v-if="index !== activeItems.length - 1" @click="sortClick(index, index + 1)" style="transform: rotate(180deg);" src="../../../../assets/images/penaltyReport/sort.png" alt="">
               <div v-if="index === activeItems.length - 1" style="width: 14px;height: 14px;"></div>
             </div>
-            <div class="item-checkbox" @click="highlightIndex = index">
+            <div class="item-checkbox" @click="highlightClick(index)">
               <img v-if="highlightIndex === index" src="../../../../assets/images/penaltyReport/checkbox-active.png" alt="">
               <img v-else src="../../../../assets/images/penaltyReport/checkbox-default.png" alt="">
             </div>
@@ -130,8 +131,16 @@ export default {
     this.children = flattenAndAddInfoTree(this.data.categories)
   },
   mounted() {
+    this.$refs.bankBasic.changeAllChecked()
   },
   methods: {
+    highlightClick (index) {
+      if (this.highlightIndex === index) {
+        this.highlightIndex = -1
+      } else {
+        this.highlightIndex = index
+      }
+    },
     selectedBanksConfirm () {
       this.selectedBanksVisible = false
       this.$nextTick(() => {
@@ -155,11 +164,13 @@ export default {
     },
     basicChange (val) {
       this.logics = val
-      this.$emit('change', {
-        banks: this.activeItems,
-        activeBank: this.highlightIndex >= 0 ? this.activeItems[this.highlightIndex] : null,
-        logics: this.logics
-      })
+      if (this.activeItems && this.activeItems.length) {
+        this.$emit('change', {
+          banks: this.activeItems,
+          activeBank: this.highlightIndex >= 0 ? this.activeItems[this.highlightIndex] : null,
+          logics: this.logics
+        })
+      }
     },
     sortClick (index1, index2) {
       let temp = this.activeItems[index1];
@@ -167,12 +178,14 @@ export default {
       this.$set(this.activeItems, index2, temp)
     },
     sortDialogConfirm () {
-      this.$emit('change', {
-        banks: this.activeItems,
-        activeBank: this.highlightIndex >= 0 ? this.activeItems[this.highlightIndex] : null,
-        logics: this.logics
-      })
-      this.sortDialogVisible = false
+      if (this.activeItems && this.activeItems.length) {
+        this.$emit('change', {
+          banks: this.activeItems,
+          activeBank: this.highlightIndex >= 0 ? this.activeItems[this.highlightIndex] : null,
+          logics: this.logics
+        })
+        this.sortDialogVisible = false
+      }
     },
     sortDialogCancel () {
       this.dialogVisible = true

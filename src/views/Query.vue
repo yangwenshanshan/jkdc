@@ -230,6 +230,18 @@
             </div>
             <div class="unit">
               <div class="text">罚没单位：万元</div>
+              <!-- <el-button
+                type="primary"
+                icon="el-icon-download"
+                @click="exportAnalysisData"
+                >统计下载</el-button
+              >
+              <el-button
+                type="primary"
+                icon="el-icon-download"
+                @click="downloadDataAsExcel"
+                >明细下载</el-button
+              > -->
               <el-button
                 type="primary"
                 icon="el-icon-download"
@@ -403,7 +415,9 @@
           </el-table>
           <div class="pagination footer">
             <div class="tooltip">
-              数据来源：中国银行保险监督管理委员会网站、中国人民银行网站、国家外汇管理局网站
+              数据来源：国家金融监督管理总局网站、中国人民银行网站、国家外汇管理局网站
+              <br>
+              数据说明：罚单数量按照处罚文号进行计算，一个处罚文号统计为一张罚单。对于监管机构未披露处罚文号的罚单，文号采用处罚机关和公示日期指代。
             </div>
             <pagination
               @size-change="sizeChange"
@@ -693,6 +707,7 @@ import pagination from "../components/pagination";
 import { URL } from "./../../config";
 import { checkLogin, checkAuth, checkAdmin } from "../assets/js/utils";
 import * as XLSX from "xlsx";
+import { exportTicketReport } from "./reportAssistant/ExportReport";
 
 function CreatePaging() {
   this.totalElements = 0;
@@ -2479,12 +2494,12 @@ export default {
       const totalRes = await request(
         "items/cl_ticket",
         {
-          "aggregate[countDistinct][0]": "id",
+          "aggregate[sum][0]": "ticket_count",
           ...otherParams,
         },
         "GET"
       );
-      const total = totalRes.data[0].countDistinct.id;
+      const total = totalRes.data[0].sum.ticket_count;
 
       // 构建分页信息
       const pagination = {
@@ -2530,6 +2545,23 @@ export default {
         ...pagination,
       };
     },
+    async exportAnalysisData(){
+      const loading = this.$loading({
+          lock: true,
+          text: '数据量较大, 导出可能需要较长时间, 请耐心等待',
+      });
+      await exportTicketReport({
+        date: JSON.parse(window.sessionStorage.getItem("reportAssistantTime")).value,
+        dimension_date: window.sessionStorage.getItem("reportAssistantDimensionDate"),
+        dimension_regulator: window.sessionStorage.getItem("reportAssistantDimensionRegulator"),
+        dimension_entity: window.sessionStorage.getItem("reportAssistantDimensionEntity"),
+        dimension_area: window.sessionStorage.getItem("reportAssistantDimensionArea"),
+        domain: window.sessionStorage.getItem('reportAssistantDomain'),
+        financial_institution_type: item.name === "银行群体分析" ? window.sessionStorage.getItem("reportAssistantGroupBank") : undefined,
+        financial_institution: item.name === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : item.name === "多家对比分析" ? JSON.parse(window.sessionStorage.getItem("reportAssistantBanks"))?.map(item => item.id).join(',') : undefined,
+      })
+      loading.close()
+    }
   },
   components: { MoreText, radioLink, scrollText, moreText, pagination },
 };
@@ -2632,6 +2664,7 @@ export default {
   .tooltip {
     font-size: 12px;
     color: #333333;
+    text-align: left;
   }
 
   &.footer {

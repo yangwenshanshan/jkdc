@@ -1,14 +1,13 @@
 <template>
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <div class="flex justify-between items-start">
-            <div>
+            <div style="width: 50%;">
                 <TitleCom title="总部处罚情况图" />
-                <BarAndLine style="height: 164px;width:532px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B05[theme]" />
+                <BarAndLine style="height: 164px;" :dimension="dimension" :datas="datas" :colors="colors.B05[theme]" />
             </div>
-            <div>
+            <div style="width: 45%;">
                 <TitleCom title="总部处罚情况表" />
-                <BaseTable style="width: 498px;" :dimension="dimension" :datas="datas" show-summary />
+                <BaseTable :dimension="dimension" :datas="datas" show-summary />
             </div>
         </div>
     </PanelItem>

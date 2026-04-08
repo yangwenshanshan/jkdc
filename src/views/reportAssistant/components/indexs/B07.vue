@@ -2,29 +2,27 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
-            <div>
+            <div style="width: 50%;">
                 <TitleCom title="罚单数（张）" />
-                <HorizontalBar style="width:587px;" :dimension="dimension" :datas="datas" :colors="colors.B07[theme]"
-                    :customOption="{
-                        grid: {
-                            top: 5,
-                            left: 140
-                        },
-                    }" />
+                <HorizontalBar :dimension="dimension" :datas="datas" :colors="colors.B07[theme]" :customOption="{
+                    grid: {
+                        top: 5,
+                        left: 140
+                    },
+                }" />
             </div>
-            <div>
+            <div style="width: 45%;">
                 <TitleCom title="罚没金额（万元）" />
-                <HorizontalBar style="width:443px;" :dimension="dimension_2" :datas="datas" :colors="colors.B07[theme]"
-                    :customOption="{
-                        grid: {
-                            top: 5,
-                            left: 10,
-                            right: 80
-                        },
-                        yAxis: {
-                            show: false
-                        }
-                    }" />
+                <HorizontalBar :dimension="dimension_2" :datas="datas" :colors="colors.B07[theme]" :customOption="{
+                    grid: {
+                        top: 5,
+                        left: 10,
+                        right: 80
+                    },
+                    yAxis: {
+                        show: false
+                    }
+                }" />
             </div>
         </div>
         <div v-else>

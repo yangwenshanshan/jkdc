@@ -209,11 +209,11 @@ export default {
                 this.ticket_datas = res.data.ticket_count_ranking.map(item => {
                     return {
                         bank_name: item.institution_name,
-                        rank_1: item.areas?.[0]?.area_name,
-                        rank_2: item.areas?.[1]?.area_name,
-                        rank_3: item.areas?.[2]?.area_name,
-                        rank_4: item.areas?.[3]?.area_name,
-                        rank_5: item.areas?.[4]?.area_name,
+                        rank_1: item.areas?.[0]?.area_short_name,
+                        rank_2: item.areas?.[1]?.area_short_name,
+                        rank_3: item.areas?.[2]?.area_short_name,
+                        rank_4: item.areas?.[3]?.area_short_name,
+                        rank_5: item.areas?.[4]?.area_short_name,
                         rank_1_ticket_count: item.areas?.[0]?.ticket_count,
                         rank_2_ticket_count: item.areas?.[1]?.ticket_count,
                         rank_3_ticket_count: item.areas?.[2]?.ticket_count,
@@ -229,11 +229,11 @@ export default {
                 this.total_datas = res.data.total_amount_ranking.map(item => {
                     return {
                         bank_name: item.institution_name,
-                        rank_1: item.areas?.[0]?.area_name,
-                        rank_2: item.areas?.[1]?.area_name,
-                        rank_3: item.areas?.[2]?.area_name,
-                        rank_4: item.areas?.[3]?.area_name,
-                        rank_5: item.areas?.[4]?.area_name,
+                        rank_1: item.areas?.[0]?.area_short_name,
+                        rank_2: item.areas?.[1]?.area_short_name,
+                        rank_3: item.areas?.[2]?.area_short_name,
+                        rank_4: item.areas?.[3]?.area_short_name,
+                        rank_5: item.areas?.[4]?.area_short_name,
                         rank_1_ticket_count: item.areas?.[0]?.ticket_count,
                         rank_2_ticket_count: item.areas?.[1]?.ticket_count,
                         rank_3_ticket_count: item.areas?.[2]?.ticket_count,

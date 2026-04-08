@@ -134,7 +134,7 @@ export function useChatOpensearch(sessionId) {
         return cb()
       })
     }).catch((err) => {
-      localStorage.removeItem("user");
+      localStorage.clear();
       app.$message.error("登录状态过期");
       app.$router.replace("/login");
     })

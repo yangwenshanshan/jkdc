@@ -2,7 +2,7 @@ module.exports = {
     assetsDir: "assets",
     runtimeCompiler: true,
     productionSourceMap: false,
-    publicPath: process.env.VUE_APP_MODE === "next" ? "/next/" : "/",
+    publicPath: "/",
     css: {
         sourceMap: true
     },

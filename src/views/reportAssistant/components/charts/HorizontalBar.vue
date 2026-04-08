@@ -1,5 +1,9 @@
 <template>
-    <div ref="chartRef" :style="{ height: height, minHeight: '100px' }" v-resize="handleResize"></div>
+    <div style="width: 100%; height: 100%;">
+        <div v-show="!noData" ref="chartRef" v-resize="handleResize"
+            :style="{ height: height, minHeight: '100px', width: '100%' }"></div>
+        <NoData :show="noData" />
+    </div>
 </template>
 
 <script>
@@ -7,11 +11,15 @@ import merge from 'lodash/merge'
 import { noDataGraphic, defaultConfig } from './configGenerate.js'
 import * as echarts from 'echarts'
 import resize from '@/directives/resize'
+import NoData from '../NoData.vue'
 
 export default {
     name: "HorizontalBar",
     directives: {
         resize
+    },
+    components: {
+        NoData
     },
     props: {
         colors: {

@@ -79,6 +79,11 @@ export default {
         blue: ['#78BAFF', '#4E70F0'],
         red: ['#FF8D8D', '#A72D00'],
     },
+    B28: {
+        green: ['#1FB8AF'],
+        blue: ['#00BBFF'],
+        red: ['#FF6030'],
+    },
     ColorfulTable: {
         green: ['#E5FAF5', '#CFFCFF', '#CDEAFD', '#EDF6F4', '#E7F9FA', '#E6F0F8'],
         blue: ['#D8EFFE', '#CFF1FF', '#CDE6FD', '#E8F5FE', '#E8F7FE', '#E6F1FF'],
@@ -88,5 +93,15 @@ export default {
         green: '#09958D',
         blue: '#2C92FF',
         red: '#DE2F2F',
+    },
+    tables: {
+        green: ['#EDF6F4', '#F6F6F6', '#FFF3CD'],
+        blue: ['#E8F5FE', '#F6F6F6', '#FFECAE'],
+        red: ['#FFF5F5', '#F6F6F6', '#FFD4B7'],
+    },
+    highlight: {
+        green: ['#CDEAFD', '#E6F0F8', '#DCEBF6', '#E5FAF5', '#EDF4F4', '#F6F6F6'],
+        blue: ['#FFF2C9', '#FFF8DF', '#F8F1D9', '#CDEAFD', '#E8F5FE', '#F6F6F6'],
+        red: ['#FFD5B8', '#FFEADB', '#FFE3CF', '#FFE6E6', '#FFF5F5', '#F6F6F6'], 
     }
 }

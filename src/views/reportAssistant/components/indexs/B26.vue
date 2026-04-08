@@ -2,7 +2,7 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="按案由数" inactive-text="按案由金额" />
         <TitleCom title="典型领域中各行排名表" />
-        <BaseTable :dimension="dimension" :datas="datas" :row-class-name="rowClass" />
+        <BaseTable :dimension="dimensionCom" :datas="datas" :row-class-name="rowClass" />
     </PanelItem>
 </template>
 
@@ -40,7 +40,9 @@ export default {
             loading: true,
             mainBankData: {},
             mainBank: mainBank,
-            dimension: [
+            dimensionCount: [],
+            dimensionTotal: [],
+            dimensionOrigin: [
                 {
                     label: "银行名称",
                     prop: "bank_name",
@@ -80,8 +82,10 @@ export default {
         },
         content() {
             return this.isChart ? this.count_content : this.amount_content
+        },
+        dimensionCom() {
+            return this.isChart ? this.dimensionCount:this.dimensionTotal
         }
-
     },
     mounted() {
         this.mainBankData = this.mainBankData = JSON.parse(window.sessionStorage.getItem("reportAssistantMainBank"))
@@ -93,34 +97,63 @@ export default {
         getB26() {
             this.cantrol = B26(this.getParams())
             this.cantrol.run().then(res => {
-                const items = res.data.reason_count_ranking.map(item => item.domain_name) || []
+                const countItems = res.data.reason_count_ranking.map(item => item.domain_name) || []
+                const countBanks = res.data.reason_count_ranking?.[0]?.bank_rankings.map(item => item.institution_name) || []
+                const totalItems = res.data.reason_amount_ranking.map(item => item.domain_name) || []
+                const totalBanks = res.data.reason_amount_ranking?.[0]?.bank_rankings.map(item => item.institution_name) || []
 
-                const banks = res.data.reason_count_ranking?.[0]?.bank_rankings.map(item => item.institution_name) || []
-                const dimension = items.map(item => {
+                const dimensionCount = countItems.map(item => {
                     return {
                         prop: `domain_name_${item}`,
                         label: item,
+                        labelClassName: this.colors.highlight[this.theme][3],
                         children: [
                             {
                                 prop: `count_${item}`,
                                 label: '案由数（个）',
                                 minWidth: 137,
-                                labelClassName: this.colors.ColorfulTable[this.theme][3],
-                                className: this.colors.ColorfulTable[this.theme][3],
+                                labelClassName: this.colors.highlight[this.theme][4],
+                                className: this.colors.highlight[this.theme][4],
                             },
                             {
                                 prop: `rank_${item}`,
                                 label: '名次',
                                 minWidth: 46,
-                                labelClassName: '#f6f6f6',
+                                labelClassName: this.colors.highlight[this.theme][5],
+                                className: this.colors.highlight[this.theme][5],
                             }
                         ]
                     }
                 })
-                this.dimension = [...this.dimension, ...dimension]
+                this.dimensionCount = [...this.dimensionOrigin, ...dimensionCount]
+
+                const dimensionTotal = totalItems.map(item => {
+                    return {
+                        prop: `domain_name_${item}`,
+                        label: item,
+                        labelClassName: this.colors.highlight[this.theme][3],
+                        children: [
+                            {
+                                prop: `count_${item}`,
+                                label: '案由金额（万元）',
+                                minWidth: 137,
+                                labelClassName: this.colors.highlight[this.theme][4],
+                                className: this.colors.highlight[this.theme][4],
+                            },
+                            {
+                                prop: `rank_${item}`,
+                                label: '名次',
+                                minWidth: 46,
+                                labelClassName: this.colors.highlight[this.theme][5],
+                                className: this.colors.highlight[this.theme][5],
+                            }
+                        ]
+                    }
+                })
+                this.dimensionTotal = [...this.dimensionOrigin, ...dimensionTotal]
 
 
-                this.count_datas = banks.map(bank => {
+                this.count_datas = countBanks.map(bank => {
                     const obj = {
                         bank_name: bank,
                     }
@@ -133,7 +166,7 @@ export default {
                     })
                     return obj
                 })
-                this.amount_datas = banks.map(bank => {
+                this.amount_datas = totalBanks.map(bank => {
                     const obj = {
                         bank_name: bank,
                     }

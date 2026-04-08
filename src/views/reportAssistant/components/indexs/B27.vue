@@ -1,17 +1,12 @@
 <template>
-    <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
+    <PanelItem :subTitle="subTitle" :content="content" :loading="loading" v-resize="resizeFn">
         <SwitchCom v-model="isChart" active-text="按案由数" inactive-text="按案由金额" />
         <TitleCom title="各行受罚较重问题类型Top10表" />
-        <div
-            style="display: grid;grid-template-columns: repeat(2, 1fr);grid-auto-rows: 40px;grid-template-rows: 40px;grid-gap: 0 80px; align-items: stretch;">
-            <div v-for="(item, index) in dimension" :key="index" :style="{
-                gridRowEnd: `span ${datas[index].length === 0 ? 4 : datas[index].length + 3}`,
-                overflow: 'hidden'
-            }">
-                <BaseTable :dimension="item" :datas="datas[index]"
-                    :header-row-class-name="item[0].label === mainBankData.name ? 'highlight' : undefined" />
-            </div>
-        </div>
+        <waterfall ref="waterfall" :data="dimension" :col="2" :gutterWidth="80">
+            <BaseTable v-for="(item, index) in dimension" :key="index" :dimension="item" :datas="datas[index]"
+                :header-row-class-name="item[0].label === mainBankData.name ? 'highlight' : undefined"
+                style="margin-bottom: 40px;" />
+        </waterfall>
     </PanelItem>
 </template>
 
@@ -25,9 +20,13 @@ import { B27 } from '../../apis.js'
 import { mainBank } from '../../icons/iconPath.js'
 import http from '../../http.js'
 import { EventBus } from '../../EventBus.js'
+import resize from '@/directives/resize.js'
 
 export default {
     name: "B27",
+    directives: {
+        resize,
+    },
     components: {
         PanelItem,
         TitleCom,
@@ -106,8 +105,7 @@ export default {
                             },
                             {
                                 prop: 'problem_type_name',
-                                label: '领域名称',
-                                showOverflowTooltip: true,
+                                label: '问题类型',
                                 align: 'left',
                             },
                             {
@@ -142,6 +140,15 @@ export default {
                 return 'highlight'
             }
         },
+        resizeFn() {
+            this.$nextTick(() => {
+                console.log(this.$refs.waterfall)
+                this.$refs.waterfall.clear()
+                setTimeout(() => {
+                    this.$refs.waterfall.init()
+                }, 0)
+            })
+        }
     }
 
 }

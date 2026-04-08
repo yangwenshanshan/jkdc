@@ -90,10 +90,23 @@ import ChartHandbook from "../views/ChartHandbook/index.vue";
 import ChartHandbookChart from "../views/ChartHandbook/chartHandbookChart.vue";
 import ChartHandbookText from "../views/ChartHandbook/chartHandbookText.vue";
 import Chat from "../views/Chat";
+
+// 引入website相关组件
+import WebsiteIndex from "../views/WebsiteIndex.vue";
+import WebSiteHome from "../views/website/Home.vue";
+import WebSiteAbout from "../views/website/About.vue";
+// import WebSiteNews from "../views/website/News.vue";
+// import WebSiteReports from "../views/website/Reports.vue";
+import WebSiteRegister from "../views/website/Register.vue";
+
 import ReportAssistant from "../views/reportAssistant/index.vue";
 import ReportAssistantDetail from "../views/reportAssistant/detail/index.vue";
 Vue.use(VueRouter);
 
+const whitelist = [
+    '/login', 
+    /^\/website\//
+]
 const routes = [
     {
         path: "/assets/:id",
@@ -104,7 +117,7 @@ const routes = [
         path: "/",
         name: "Home",
         component: Index,
-        redirect: "login",
+        redirect: "/website/home",
         children: [
             {
                 path: "/ticket",
@@ -482,6 +495,38 @@ const routes = [
         path: "/noPermission",
         name: "NoPermission",
         component: NoPermission
+    }, {
+        path: "/website",
+        name: "website",
+        component: WebsiteIndex,
+        redirect: "/website/home",
+        children: [
+            {
+                path: "home",
+                name: "WebSiteHome",
+                component: WebSiteHome
+            },
+            {
+                path: "about",
+                name: "WebSiteAbout",
+                component: WebSiteAbout
+            },
+            // {
+            //     path: "news",
+            //     name: "WebSiteNews",
+            //     component: WebSiteNews
+            // },
+            // {
+            //     path: "reports",
+            //     name: "WebSiteReports",
+            //     component: WebSiteReports
+            // },
+            {
+                path: "register",
+                name: "WebSiteRegister",
+                component: WebSiteRegister
+            }
+        ]
     }
     /*{
         path: '/about',
@@ -497,9 +542,36 @@ const router = new VueRouter({
     routes
 });
 
+function isLoginPath (path, next) {
+    const stringList = whitelist.filter(el => typeof el === 'string')
+    const regList = whitelist.filter(el => el instanceof RegExp)
+    if (stringList.includes(path)) {
+        next()
+        return 
+    }
+    if (regList.filter(el => el.test(path)).length) {
+        next()
+        return
+    }
+    next({ path: "/login", replace: true });
+}
+
 router.beforeEach((to, from, next) => {
-    let user = localStorage.getItem("user");
-    user && (user = JSON.parse(user));
+    let tokenData = localStorage.getItem("tokenData");
+    if (tokenData) {
+        try {
+            const tokenInfo = JSON.parse(tokenData)
+            if (tokenInfo.access_token) {
+                next()
+            } else {
+                isLoginPath(to.path, next)
+            }
+        } catch (error) {
+            isLoginPath(to.path, next)
+        }
+    } else {
+        isLoginPath(to.path, next)
+    }
 
     // if (user) {
     //     if (!user.lawsAvailable) {

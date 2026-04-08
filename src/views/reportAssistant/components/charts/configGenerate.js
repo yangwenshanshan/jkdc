@@ -24,14 +24,14 @@ export const defaultConfig = (dimension) => ({
         textStyle: {
             color: '#606266',
         },
-        appendTo: () => document.body,
+        appendTo: () => document.querySelector('.report-assistant-detail'),
         className: 'my-chart-tooltip'
     },
     grid: {
         top: 40,
         bottom: 20,
         left: 60,
-        right: 60
+        right: dimension.length < 4 ? 60 : (dimension.length - 3) * 54 + 60
     },
     legend: {
         top: 0,

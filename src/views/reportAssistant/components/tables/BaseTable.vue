@@ -1,8 +1,10 @@
 <template>
-    <el-table ref="table" :data="datas" border v-bind="$attrs" :cell-style="cellStyle" tooltip-effect="dark"
-        :header-cell-style="headerCellStyle" :style="{ '--hover-bg-color': hoverBgColor }" sum-text="总计">
+    <el-table v-resize="resizeTable" ref="table" :data="datasCom" border v-bind="$attrs" :cell-style="cellStyle"
+        tooltip-effect="dark" :header-cell-style="headerCellStyle"
+        :style="{ '--hover-bg-color': hoverBgColor, '--highlight-color': highlightColor }" sum-text="总计"
+        :show-summary="showSum">
         <el-table-column v-for="(item, index) in dimension" :key="index" header-align="center"
-            :align="item.align || 'center'" v-bind="item">
+            :align="item?.align || 'center'" v-bind="item">
             <template slot="header" slot-scope="scope">
                 <CustomRender v-if="item.renderHeader" :myRender="item.renderHeader" :key="item.prop + 'level2'"
                     :params="scope" />
@@ -14,24 +16,36 @@
                     <span v-else>{{ item.label }}</span>
                 </template>
             </template>
-            <template v-if="item.children">
-                <el-table-column v-for="(ite) in item.children" :key="ite.prop" header-align="center"
-                    :align="ite.align || 'center'" v-bind="ite"></el-table-column>
-            </template>
-
             <template slot-scope="scope">
                 <CustomRender v-if="item.render" :myRender="item.render" :key="item.prop + 'level3'" :params="scope" />
-                <span v-else>{{ scope.row[item.prop] }}</span>
+                <span v-else>{{ scope.row[item.prop] || '-' }}</span>
+            </template>
+
+            <template v-if="item.children?.length > 0">
+                <el-table-column v-for="(ite) in item.children" :key="ite.prop" header-align="center"
+                    :align="ite?.align || 'center'" v-bind="ite">
+                    <template slot-scope="scope">
+                        <CustomRender v-if="ite.render" :myRender="ite.render" :key="ite.prop + 'level3'"
+                            :params="scope" />
+                        <span v-else>{{ scope.row[ite.prop] || '-' }}</span>
+                    </template>
+                </el-table-column>
             </template>
         </el-table-column>
+
     </el-table>
 </template>
 
 <script>
 import CustomRender from '../CustomRender.vue'
 import colors from '../ConstColors.js'
+import resize from '@/directives/resize'
+
 export default {
     name: "BaseTable",
+    directives: {
+        resize
+    },
     components: {
         CustomRender
     },
@@ -58,18 +72,28 @@ export default {
         reportName() {
             return this.activeReport().name
         },
-        // 单元格背景颜色
-        cellColor() {
-            return '#F6F6F6'
-        },
         // 表头背景颜色(根据主题色)
         headerColor() {
-            return this.colors.ColorfulTable[this.theme][3]
+            return this.colors.tables[this.theme][0]
+        },
+        // 单元格背景颜色
+        cellColor() {
+            return this.colors.tables[this.theme][1]
         },
         // 鼠标悬停背景颜色(根据主题色)
         hoverBgColor() {
-            return this.theme === 'green' ? '#FFF3CD' : this.theme === 'blue' ? '#FFECAE' : '#FFD4B7'
+            return this.colors.tables[this.theme][2]
         },
+        // 高亮背景颜色(根据主题色)
+        highlightColor() {
+            return this.colors.highlight[this.theme][0]
+        },
+        datasCom() {
+            return this.datas.length > 0 ? this.datas : [{}]
+        },
+        showSum() {
+            return this.datas.length > 0 ? this.$attrs['show-summary'] : false
+        }
     },
     methods: {
         // 把className和labelClassName作为颜色传参使用
@@ -89,6 +113,9 @@ export default {
             } else {
                 return `background: ${this.headerColor};`
             }
+        },
+        resizeTable() {
+            this.$refs.table.doLayout()
         }
     },
     watch: {
@@ -105,7 +132,8 @@ export default {
 
 <style scoped lang="scss">
 .el-table {
-    border: none;
+    border-width: 0 !important;
+    min-width: 100%;
 
     &::before,
     &::after {
@@ -137,6 +165,7 @@ export default {
                 }
             }
         }
+
         th .cell {
             padding: 0 !important;
         }
@@ -151,7 +180,7 @@ export default {
         }
 
         .highlight .el-table__cell {
-            background-color: #CDEAFD !important;
+            background-color: var(--highlight-color) !important;
         }
 
         .el-table__empty-block {
@@ -162,10 +191,18 @@ export default {
             line-height: 40px;
         }
 
-        .el-table__header,
-        .el-table__body,
-        .el-table__footer {
-            border-collapse: collapse;
+        .el-table__footer-wrapper {
+            margin-top: 0;
+        }
+
+        .el-table__empty-block,
+        .el-table__empty-text {
+            display: block;
+            width: 100%;
+        }
+
+        .empty-row {
+            width: 100% !important;
         }
     }
 }
@@ -203,7 +240,7 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHZpZXdCb3g9IjAgMCAxNSAxNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzEyODhfMjI0OTYpIj4KPHBhdGggZD0iTTcuMDQ4NSAxLjY2MjExSDEyLjkyMjJWMTUuNzU3OUw3LjA0ODUgMTIuMjMzOUwxLjE3NDggMTUuNzU3OVYxLjY2MjExSDcuMDQ4NVoiIGZpbGw9IiNGRjRBNDEiLz4KPHBhdGggZD0iTTcuMDQ4NSAxMi4yMzM5TDEuMTc0OCAxNS43NTc5VjEuNjYyMTFINC42MTE3QzQuNjExNyAxLjY2MjExIDcuMDQ4NSAxMi4yMzM5IDcuMDQ4NSAxMi4yMzM5WiIgZmlsbD0iI0ZGNkU2RSIvPgo8L2c+CjxwYXRoIGQ9Ik03Ljg3NjIyIDEwLjU5NzJINi43NDIyMlY0LjU3NjIyTDUuMjIxMjIgNS40NDkyMkw1LjIzMDIyIDQuMzE1MjJINy4wNTcyMkM3LjA1NzIyIDQuMzE1MjIgNy44NzYyMiAxMC41OTcyIDcuODc2MjIgMTAuNTk3MloiIGZpbGw9IndoaXRlIi8+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzEyODhfMjI0OTYiPgo8cmVjdCB3aWR0aD0iMTQuMDk2OSIgaGVpZ2h0PSIxNC4wOTU3IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAxLjk1NTA4KSIvPgo8L2NsaXBQYXRoPgo8L2RlZnM+Cjwvc3ZnPg==');
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUiIGhlaWdodD0iMTciIHZpZXdCb3g9IjAgMCAxNSAxNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzEyODhfMjI0OTYpIj4KPHBhdGggZD0iTTcuMDQ4NSAxLjY2MjExSDEyLjkyMjJWMTUuNzU3OUw3LjA0ODUgMTIuMjMzOUwxLjE3NDggMTUuNzU3OVYxLjY2MjExSDcuMDQ4NVoiIGZpbGw9IiNGRjRBNEEiLz4KPHBhdGggZD0iTTcuMDQ4NSAxMi4yMzM5TDEuMTc0OCAxNS43NTc5VjEuNjYyMTFINy4wNDg1VjEyLjIzMzlaIiBmaWxsPSIjRkY2RTZFIi8+CjwvZz4KPHBhdGggZD0iTTcuODc2MjIgMTAuNTk3Mkg2Ljc0MjIyVjQuNTc2MjJMNS4yMjEyMiA1LjQ0OTIyTDUuMjMwMjIgNC4zMTUyMkw3LjA1NzIyIDMuMjUzMjJINy44NzYyMlYxMC41OTcyWiIgZmlsbD0id2hpdGUiLz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMTI4OF8yMjQ5NiI+CjxyZWN0IHdpZHRoPSIxNC4wOTY5IiBoZWlnaHQ9IjE0LjA5NTciIGZpbGw9IndoaXRlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDEuOTU1MDgpIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==');
     background-position: center;
     background-repeat: no-repeat;
     width: 18px;

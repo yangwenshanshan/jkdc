@@ -143,7 +143,7 @@ function refreshToken () {
         resolve(res.data.data)
       }).catch(() => {
         isRefreshing = false
-        localStorage.removeItem("user");
+        localStorage.clear();
         app.$message.error("登录状态过期");
         app.$router.replace("/login");
         reject('token刷新失败')
@@ -155,7 +155,7 @@ const requestManager = new RequestManager();
 const http = {
   get: (url, config) => {
     const _t = Date.parse(`${new Date()}`)
-    const key = `${url}_get_${_t}`
+    const key = `${url}_get_${_t}_${JSON.stringify(config.params)}`
     return {
       key,
       run: () => new Promise((resolve, reject) => {
@@ -175,7 +175,7 @@ const http = {
   },
   post: (url, data, config) => {
     const _t = Date.parse(`${new Date()}`)
-    const key = `${url}_get_${_t}`
+    const key = `${url}_post_${_t}_${JSON.stringify(config.params)}`
     return {
       key,
       run: () => new Promise((resolve, reject) => {

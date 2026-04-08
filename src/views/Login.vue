@@ -39,17 +39,19 @@
                 </div>
             </div>
             <div class="info">
-                <a href="https://beian.miit.gov.cn/"
-                    >备案号：京ICP备19058569号-2</a
-                >
+               <Copyright />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import Copyright from '@/components/copyright.vue'
 export default {
     name: "Login",
+    components: {
+        Copyright
+    },
     data: function() {
         return {
             signIn: {
@@ -165,10 +167,8 @@ export default {
         width: 578px;
         position: relative;
         .info {
-            font-size: 16px;
-            a {
-                color: #999;
-            }
+            color: #999999;
+            font-size: 14px;
             position: absolute;
             right: 0;
             bottom: -12%;

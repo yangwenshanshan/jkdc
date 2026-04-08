@@ -2,29 +2,27 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
-            <div>
+            <div style="width: 55%;">
                 <TitleCom title="案由数（个）" />
-                <HorizontalBar style="width:587px;" :dimension="dimension" :datas="datas" :colors="colors.B12[theme]"
-                    :customOption="{
-                        grid: {
-                            top: 5,
-                            left: 140
-                        },
-                    }" />
+                <HorizontalBar :dimension="dimension" :datas="datas" :colors="colors.B12[theme]" :customOption="{
+                    grid: {
+                        top: 5,
+                        left: 140
+                    },
+                }" />
             </div>
-            <div>
+            <div style="width: 40%;">
                 <TitleCom title="案由金额（万元）" />
-                <HorizontalBar style="width:443px;" :dimension="dimension_2" :datas="datas" :colors="colors.B12[theme]"
-                    :customOption="{
-                        grid: {
-                            top: 5,
-                            left: 10,
-                            right: 80
-                        },
-                        yAxis: {
-                            show: false
-                        }
-                    }" />
+                <HorizontalBar :dimension="dimension_2" :datas="datas" :colors="colors.B12[theme]" :customOption="{
+                    grid: {
+                        top: 5,
+                        left: 10,
+                        right: 80
+                    },
+                    yAxis: {
+                        show: false
+                    }
+                }" />
             </div>
         </div>
         <div v-else>
@@ -124,7 +122,7 @@ export default {
             this.cantrol = B12(this.getParams())
             this.cantrol.run().then(res => {
                 this.datas = res.data
-                this.content = res.summary
+                this.content = res.summary.description
             }).finally(() => {
                 this.loading = false
             })

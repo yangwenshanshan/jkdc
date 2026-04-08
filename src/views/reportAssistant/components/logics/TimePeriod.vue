@@ -84,11 +84,14 @@ export default {
       pastHalfYear.forEach(element => {
         result[2].list.push(element)
       });
-      const currentYear = new Date().getFullYear() - 1
-      result[3].list.push({
+      const currentYear = new Date().getFullYear()
+      result[3].list.push(...[{
+        name: `${currentYear - 1}年度`,
+        value: `${currentYear - 1}`
+      }, {
         name: `${currentYear}年度`,
         value: `${currentYear}`
-      })
+      }])
       return result
     },
     getPastTwelveMonths() {
@@ -115,7 +118,7 @@ export default {
       const currentQuarterYear = now.getFullYear();
       const currentQuarter = Math.floor(now.getMonth() / 3) + 1;
 
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 0; i < 4; i++) {
         let year = currentQuarterYear;
         let quarter = currentQuarter - i;
 
@@ -140,8 +143,8 @@ export default {
       const currentMonth = now.getMonth();
       const currentHalfYear = currentMonth < 6 ? 'H1' : 'H2';
 
-      let year = currentYear - (currentHalfYear === 'H2' ? 0 : 1);
-      let halfYear = currentHalfYear === 'H1' ? 'H2' : 'H1';
+      let year = currentYear;
+      let halfYear = currentHalfYear;
 
       for (let i = 0; i < 2; i++) {
         halfYears.push({

@@ -2,7 +2,7 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="按罚单数" inactive-text="按罚没金额" />
         <TitleCom title="地区处罚中各行排名表" />
-        <BaseTable :dimension="dimension" :datas="datas" :row-class-name="rowClass" />
+        <BaseTable :dimension="dimensionCom" :datas="datas" />
     </PanelItem>
 </template>
 
@@ -47,6 +47,15 @@ export default {
         },
         content() {
             return this.isChart ? this.ticket_content : this.total_content
+        },
+        dimensionCom() {
+            const arr = this.dimension.slice(1).map(item => {
+                if (item.children) {
+                    item.children[0].label = this.isChart ? '罚单数（张）' : '罚没金额（万元）'
+                }
+                return item
+            })
+            return [...this.dimensionOrigin, ...arr]
         }
     },
     data() {
@@ -56,15 +65,17 @@ export default {
             loading: true,
             mainBank: mainBank,
             mainBankData: {},
-            dimension: [
+            dimension: [],
+            dimensionOrigin: [
                 {
                     label: "",
                     prop: "area_name-parent",
                     minWidth: 80,
+                    fixed: "left",
                     children: [
                         {
                             label: "省市",
-                            prop: "area_name",
+                            prop: "area_short_name",
                             minWidth: 80,
                         },
                     ]
@@ -93,12 +104,12 @@ export default {
                 }
             })
             const arr = _x.map((item) => ({
-                area_name: item.area_name,
+                area_short_name: item.area_short_name,
             }))
             _keys.forEach((key) => {
                 const _orig = originArr[key].areas
                 arr.forEach((item, index) => {
-                    const findItem = _orig.find((i) => i.area_name === item.area_name)
+                    const findItem = _orig.find((i) => i.area_short_name === item.area_short_name)
                     arr[index][`count_${key}`] = findItem?.value ?? '-'
                     arr[index][`rank_${key}`] = findItem?.ranking ?? '-'
                 })
@@ -110,11 +121,12 @@ export default {
             this.cantrol.run().then(res => {
                 const counts = res.data.ticket_count_ranking
                 const _keys = Object.keys(counts)
+                const arr = []
                 _keys.forEach((key) => {
-                    this.dimension.push({
+                    arr.push({
                         label: key,
                         prop: `${key}_name`,
-                        labelClassName: key === this.mainBankData.name ? '#CDEAFD' : undefined,
+                        labelClassName: key === this.mainBankData.name ? this.colors.highlight[this.theme][0] : this.colors.highlight[this.theme][3],
                         renderHeader: (h, params) => {
                             return h('div', {}, [
                                 params.column.label === this.mainBankData.name ? h('span', {
@@ -135,19 +147,20 @@ export default {
                                 prop: `count_${key}`,
                                 label: '罚单数（张）',
                                 minWidth: 137,
-                                className: key === this.mainBankData.name ? '#CDEAFD' : this.colors.ColorfulTable[this.theme][3],
-                                labelClassName: key === this.mainBankData.name ? '#CDEAFD' : this.colors.ColorfulTable[this.theme][3],
+                                labelClassName: key === this.mainBankData.name ? this.colors.highlight[this.theme][1] : this.colors.highlight[this.theme][4],
+                                className: key === this.mainBankData.name ? this.colors.highlight[this.theme][1] : this.colors.highlight[this.theme][4],
                             },
                             {
                                 prop: `rank_${key}`,
                                 label: '名次',
                                 minWidth: 46,
-                                className: key === this.mainBankData.name ? '#CDEAFD' : '',
-                                labelClassName: key === this.mainBankData.name ? '#CDEAFD' : '#f6f6f6',
+                                labelClassName: key === this.mainBankData.name ? this.colors.highlight[this.theme][2] : this.colors.highlight[this.theme][5],
+                                className: key === this.mainBankData.name ? this.colors.highlight[this.theme][2] : this.colors.highlight[this.theme][5],
                             }
                         ]
                     })
                 })
+                this.dimension = [...this.dimensionOrigin, ...arr]
 
                 this.ticket_datas = this.dealDatas(counts)
                 this.total_datas = this.dealDatas(res.data.total_amount_ranking)

@@ -2,13 +2,12 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
-            <div>
+            <div :style="{ width: showAll ? '48%' : '100%' }">
                 <TitleCom title="机构" />
-                <BarAndLine style="height: 164px;width:560px;" :dimension="dimension" :datas="datas"
-                    :colors="colors.B04[theme]" :symbol="iconBank" :customOption="{
+                <BarAndLine style="height: 164px;" :dimension="dimension" :datas="datas" :colors="colors.B04[theme]"
+                    :symbol="iconBank" :customOption="{
                         grid: {
                             top: 10,
-                            left: 30,
                             right: 5,
                         },
                         legend: {
@@ -16,13 +15,12 @@
                         },
                     }" />
             </div>
-            <div>
+            <div v-if="showAll" style="width:48%;">
                 <TitleCom title="个人" />
-                <BarAndLine style="height: 164px;width:560px;" :dimension="dimension_2" :datas="datas"
-                    :colors="colors.B04[theme]" :symbol="iconBank" :customOption="{
+                <BarAndLine style="height: 164px;" :dimension="dimension_2" :datas="datas" :colors="colors.B04[theme]"
+                    :symbol="iconBank" :customOption="{
                         grid: {
                             top: 10,
-                            left: 30,
                             right: 5,
                         },
                         legend: {
@@ -33,7 +31,7 @@
         </div>
         <div v-else>
             <TitleCom title="受罚对象概览表" />
-            <BaseTable :dimension="dimension_3" :datas="datas" />
+            <BaseTable :dimension="dimension_3.slice(0, showAll ? 3 : 2)" :datas="datas" />
         </div>
     </PanelItem>
 </template>
@@ -81,6 +79,7 @@ export default {
             iconBank: bank,
             isChart: true,
             loading: true,
+            showAll: false,
             dimension: [
                 {
                     label: "时段",
@@ -128,6 +127,13 @@ export default {
     },
     methods: {
         getB04() {
+            const dimensionEntity = window.sessionStorage.getItem("reportAssistantDimensionEntity")
+            console.log(dimensionEntity)
+            if (dimensionEntity === 'all') {
+                this.showAll = true
+            } else {
+                this.showAll = false
+            }
             this.cantrol = B04(this.getParams())
             this.cantrol.run().then(res => {
                 this.datas = res.data

@@ -26,11 +26,11 @@
                 >处罚查询</router-link
               >
             </el-dropdown-item>
-            <el-dropdown-item>
+            <!-- <el-dropdown-item>
               <router-link to="/charts"
                 >处罚分析</router-link
               >
-            </el-dropdown-item>
+            </el-dropdown-item> -->
             <el-dropdown-item>
               <router-link to="/reportAssistant"
                 >报告助手</router-link
@@ -105,7 +105,7 @@ export default {
       }
     },
     exit() {
-      localStorage.removeItem("user");
+      localStorage.clear();
       this.$router.replace("/login");
       this.$message.success("退出成功");
     },
@@ -125,25 +125,27 @@ export default {
   },
   mounted() {
     let user = localStorage.getItem("user");
-    user && (user = JSON.parse(user));
-    this.user = user;
-    let showName = ''
-    if (this.user.email) {
-       showName = this.user.email.split('@')[0]
-    } else {
-      showName = this.user.full_name
-    }
-    this.showName = showName;
-    if (this.user && this.user.id) {
-      this.isLogin = true;
-    }
-    if (user === undefined || user === null || user === "") {
-      return;
-    } else {
-      if (user.isAdmin === 0 || user.isAdmin === null) {
-        this.isAdmin = false;
+    if (user) {
+      user = JSON.parse(user)
+      this.user = user;
+      let showName = ''
+      if (this.user.email) {
+         showName = this.user.email.split('@')[0]
       } else {
-        this.isAdmin = true;
+        showName = this.user.full_name
+      }
+      this.showName = showName;
+      if (this.user && this.user.id) {
+        this.isLogin = true;
+      }
+      if (user === undefined || user === null || user === "") {
+        return;
+      } else {
+        if (user.isAdmin === 0 || user.isAdmin === null) {
+          this.isAdmin = false;
+        } else {
+          this.isAdmin = true;
+        }
       }
     }
   },

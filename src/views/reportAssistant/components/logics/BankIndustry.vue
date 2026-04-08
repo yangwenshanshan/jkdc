@@ -1,12 +1,17 @@
 <template>
   <div class="BankIndustry">
-    <BankBasic @change="basicChange" :options="options" :children="children"></BankBasic>
+    <BankBasic
+      @change="basicChange"
+      :options="options"
+      :children="children"
+      ref="bankBasic"
+    ></BankBasic>
   </div>
 </template>
 
 <script>
 import BankBasic from './BankBasic.vue'
-import { getIndustry, flattenAndAddInfoTree } from '../logics/data'
+import { flattenAndAddInfoTree } from '../logics/data'
 import step21 from '../../../../assets/images/penaltyReport/step2-1.png'
 
 export default {
@@ -39,6 +44,7 @@ export default {
     this.children = flattenAndAddInfoTree(this.data.categories)
   },
   mounted() {
+    this.$refs.bankBasic.changeAllChecked()
   },
   methods: {
     basicChange (val) {

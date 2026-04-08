@@ -2,7 +2,7 @@
     <PanelItem :subTitle="subTitle" :content="content" :loading="loading">
         <SwitchCom v-model="isChart" active-text="图" inactive-text="表" />
         <div v-if="isChart" class="flex justify-between items-start">
-            <div :style="{ width: showAll ? '587px' : '100%' }">
+            <div :style="{ width: showAll ? '50%' : '100%' }">
                 <TitleCom title="机构" />
                 <PictorialBar :dimension="dimension" :datas="datas" :colors="colors.B03[theme]" :symbol="iconBank"
                     :customOption="{
@@ -12,7 +12,7 @@
                         },
                     }" />
             </div>
-            <div v-if="showAll" style="width:443px;">
+            <div v-if="showAll" style="width:45%;">
                 <TitleCom title="个人" />
                 <PictorialBar :dimension="dimension_2" :datas="datas" :colors="colors.B03[theme]" :symbol="iconUser"
                     :customOption="{
@@ -28,7 +28,7 @@
         </div>
         <div v-else>
             <TitleCom title="受罚对象概览表" />
-            <BaseTable :dimension="dimension_3" :datas="datas" />
+            <BaseTable :dimension="dimension_3.slice(0, showAll ? 3 : 2)" :datas="datas" />
         </div>
     </PanelItem>
 </template>
@@ -130,16 +130,7 @@ export default {
             } else {
                 this.showAll = false
             }
-            this.cantrol = B03({
-                date: JSON.parse(window.sessionStorage.getItem("reportAssistantTime")).value,
-                dimension_date: window.sessionStorage.getItem("reportAssistantDimensionDate"),
-                dimension_regulator: window.sessionStorage.getItem("reportAssistantDimensionRegulator"),
-                dimension_entity: window.sessionStorage.getItem("reportAssistantDimensionEntity"),
-                dimension_area: window.sessionStorage.getItem("reportAssistantDimensionArea"),
-                domain: window.sessionStorage.getItem('reportAssistantDomain'),
-                financial_institution_type: this.reportName === "银行群体分析" ? window.sessionStorage.getItem("reportAssistantGroupBank") : undefined,
-                financial_institution: this.reportName === "单家银行分析" ? window.sessionStorage.getItem("reportAssistantSingleBank") : this.reportName === "多家对比分析" ? window.sessionStorage.getItem("reportAssistantBanks") : undefined,
-            })
+            this.cantrol = B03(this.getParams())
             this.cantrol.run().then(res => {
                 this.datas = res.data
                 this.content = res.summary.description
