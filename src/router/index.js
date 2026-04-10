@@ -38,12 +38,14 @@ import Login from "../views/Login";
 import Register from "../views/Register";
 import Query from "../views/Query";
 import FinancialCases from "../views/FinancialCases";
+import RiskEvent from "../views/riskEvent/index.vue";
 import UserFinancialRegulation from "../views/userFinancialRegulation/index.vue";
 import PDFViewer from "../views/PDFViewer/index.vue";
 import SearchLaw from "../views/userFinancialRegulation/SearchLaw.vue";
 import SearchKnowledge from "../views/userFinancialRegulation/SearchKnowledge.vue";
 import ViewDetail from "../views/userFinancialRegulation/ViewDetail.vue";
 import JudgeDocumentById from "../views/components/JudgeDocumentById.vue";
+import RiskEventById from "../views/riskEvent/detail/index.vue";
 import JudgeCaseById from "../views/components/JudgeCaseById.vue";
 import Charts from "../views/Charts";
 import Chart from "../views/Chart";
@@ -320,6 +322,16 @@ const routes = [
                 path: "/reportAssistant/detail",
                 name: "ReportAssistantDetail",
                 component: ReportAssistantDetail
+            },
+            {
+                path: "/risk_event",
+                name: "RiskEvent",
+                component: RiskEvent
+            },
+            {
+                path: "/risk_event/:id",
+                name: "RiskEventById",
+                component: RiskEventById
             },
         ]
     },

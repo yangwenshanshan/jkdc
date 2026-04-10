@@ -39,11 +39,25 @@
           </el-dropdown-menu>
         </el-dropdown>
 
-        <router-link
-          to="/case_judgement_document"
-          :class="{ active: tab === '/case_judgement_document' }"
-          >金融案件</router-link
-        >
+        <el-dropdown style="margin-right: 30px;" trigger="hover">
+          <span class="el-dropdown-link" :class="{ active: tab === '/case_judgement_document' || tab === '/risk_event' }">
+            风险案件<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <!-- 下拉菜单内容 -->
+          <el-dropdown-menu style="margin-top: -10px" slot="dropdown">
+            <el-dropdown-item>
+              <router-link to="/case_judgement_document"
+                >刑事案件</router-link
+              >
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <router-link to="/risk_event"
+                >风险事件</router-link
+              >
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+
         <router-link
           to="/chartHandbook"
           :class="{ active: tab === '/chartHandbook' }"
