@@ -4,9 +4,9 @@
       <el-row>
         <el-col class="riskEvent_search_col" :xs="22" :sm="22" :md="22" :lg="22" :xl="20">
           <div class="header_search">
-            <el-form :inline="true" :disabled="!isAccessible">
+            <el-form :inline="true" :disabled="!isAccessible" label-width="100px">
               <el-form-item label="业务领域">
-                <el-select clearable v-model="queryInfo.domain" placeholder="请选择业务领域，单选">
+                <el-select clearable :remote-method="getDomain" filterable remote v-model="queryInfo.domain" placeholder="请选择业务领域，单选">
                   <el-option v-for="item in domainList" :key="item.id" :label="item.name" :value="item.id" ></el-option>
                 </el-select>
               </el-form-item>
@@ -367,6 +367,11 @@ export default {
             this.submitQuery[`filter[_and][${index}][tags][cl_tag_id][id][_eq]`] = this.queryInfo[key]
             index++
           }
+          if (key === 'domain') {
+            this.submitQuery[`filter[_and][${index}][_or][0][tags][cl_tag_id][domain_naifan][_eq]`] = this.queryInfo[key]
+            this.submitQuery[`filter[_and][${index}][_or][1][tags][cl_tag_id][domain_bohai][_eq]`] = this.queryInfo[key]
+            index++
+          }
         }
       })
     },
@@ -421,15 +426,19 @@ export default {
         });
       });
     },
-    getDomain () {
-      this.request("/items/cl_domain", {
-        fields: 'id,name',
-        'filter[_and][0][tags][tag][risk_events][_nnull]': true,
-        limit: 10,
-        page: 1
-      }, "GET").then(res => {
-        this.domainList = res.data;
-      });
+    getDomain (query) {
+      if (query) {
+        this.request("/items/cl_domain", {
+          fields: 'id,name',
+          'filter[_and][0][_or][0][tags_naifan][risk_events][_nnull]': true,
+          'filter[_and][0][_or][1][tags_bohai][risk_events][_nnull]': true,
+          'filter[_and][1][name][_contains]': query ? query : undefined,
+          limit: 10,
+          page: 1
+        }, "GET").then(res => {
+          this.domainList = res.data;
+        });
+      }
     },
     getFinancialInstitutionType (query) {
       if (query) {
