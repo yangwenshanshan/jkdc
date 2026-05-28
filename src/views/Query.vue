@@ -2494,12 +2494,12 @@ export default {
       const totalRes = await request(
         "items/cl_ticket",
         {
-          "aggregate[sum][0]": "ticket_count",
+          "aggregate[countDistinct][0]": "id",
           ...otherParams,
         },
         "GET"
       );
-      const total = totalRes.data[0].sum.ticket_count;
+      const total = totalRes.data[0].countDistinct.id;
 
       // 构建分页信息
       const pagination = {

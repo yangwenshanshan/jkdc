@@ -4,7 +4,7 @@
       <el-row>
         <el-col class="riskEvent_search_col" :xs="22" :sm="22" :md="22" :lg="22" :xl="20">
           <div class="header_search">
-            <el-form :inline="true" :disabled="!isAccessible" label-width="100px">
+            <el-form :inline="true" :disabled="!isAccessible" label-width="85px">
               <el-form-item label="业务领域">
                 <el-select clearable :remote-method="getDomain" filterable remote v-model="queryInfo.domain" placeholder="请选择业务领域，单选">
                   <el-option v-for="item in domainList" :key="item.id" :label="item.name" :value="item.id" ></el-option>
@@ -19,6 +19,9 @@
                 <el-select clearable v-model="queryInfo.amount" placeholder="请选择事件金额区间">
                   <el-option v-for="(item, index) in amountList" :key="index" :label="item.name" :value="item.id" ></el-option>
                 </el-select>
+              </el-form-item>
+              <el-form-item label="事件标题">
+                <el-input clearable v-model="queryInfo.title" placeholder="请输入关键词"></el-input>
               </el-form-item>
               <el-form-item label="业务产品">
                 <el-select clearable :remote-method="getTag" filterable remote v-model="queryInfo.tag" placeholder="请输入业务产品关键词">
@@ -169,7 +172,8 @@ export default {
         financial_institution_type: '',
         domain: '',
         area: '',
-        tag: ''
+        tag: '',
+        title: ''
       },
       queryInfo: {},
       amountList: [{
@@ -372,6 +376,10 @@ export default {
             this.submitQuery[`filter[_and][${index}][_or][1][tags][cl_tag_id][domain_bohai][_eq]`] = this.queryInfo[key]
             index++
           }
+          if (key === 'title') {
+            this.submitQuery[`filter[_and][${index}][title][_contains]`] = this.queryInfo[key]
+            index++
+          }
         }
       })
     },
@@ -524,9 +532,9 @@ export default {
       margin: 0 auto;
       float: none;
       .header_search{
-        padding: 0 104px;
+        padding: 0 84px;
         :deep .el-form-item{
-          width: 30%;
+          width: 24%;
         }
       }
     }
